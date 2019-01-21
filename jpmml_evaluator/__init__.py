@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from pandas import DataFrame
 from py4j.java_collections import JavaMap
 from py4j.java_gateway import JavaGateway
 
@@ -30,6 +31,14 @@ class Evaluator(JavaObject):
 		javaResults = self.javaEvaluator.evaluate(javaArguments)
 		results = jvm.org.jpmml.evaluator.EvaluatorUtil.decode(javaResults)
 		return results
+
+	def evaluateAll(self, arguments_df):
+		argument_records = arguments_df.to_dict(orient = "records")
+		result_records = []
+		for argument_record in argument_records:
+			result_record = self.evaluate(argument_record)
+			result_records.append(result_record)
+		return DataFrame.from_records(result_records)
 
 class BaseModelEvaluatorBuilder(JavaObject):
 

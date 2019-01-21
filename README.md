@@ -54,7 +54,7 @@ evaluatorBuilder = LoadingModelEvaluatorBuilder(gateway) \
 evaluator = evaluatorBuilder.build()
 ```
 
-Evaluating a data record:
+Evaluating a single data record:
 
 ```python
 arguments = {
@@ -65,6 +65,18 @@ arguments = {
 }
 
 results = evaluator.evaluate(arguments)
+print(results)
+```
+
+Evaluating a collection of data records:
+
+```python
+import pandas
+
+arguments_df = pandas.read_csv("Iris.csv", sep = ",")
+
+results_df = evaluator.evaluateAll(arguments_df)
+print(results_df)
 ```
 
 Shutting down the Py4J gateway:

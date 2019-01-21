@@ -5,6 +5,7 @@ from jpmml_evaluator import launch_gateway
 from unittest import TestCase
 
 import os
+import pandas
 
 def _resource(name):
 	return os.path.join(os.path.dirname(__file__), "resources", name)
@@ -43,3 +44,11 @@ class EvaluatorTest(TestCase):
 		self.assertEqual(0.0, results["Probability_versicolor"])
 		self.assertEqual(0.0, results["Probability_virginica"])
 		self.assertEqual("2", results["Node_Id"])
+
+		arguments_df = pandas.read_csv(_resource("Iris.csv"), sep = ",")
+		print(arguments_df.head(5))
+
+		results_df = evaluator.evaluateAll(arguments_df)
+		print(results_df.head(5))
+
+		self.assertEqual((150, 5), results_df.shape)
