@@ -42,7 +42,7 @@ from jpmml_evaluator import launch_gateway
 gateway = launch_gateway()
 ```
 
-Building a model evaluator from a PMML file:
+Building a verified model evaluator from a PMML file:
 
 ```python
 from jpmml_evaluator import Evaluator, LoadingModelEvaluatorBuilder
@@ -51,7 +51,8 @@ evaluatorBuilder = LoadingModelEvaluatorBuilder(gateway) \
 	.setLocatable(True) \
 	.loadFile("DecisionTreeIris.pmml")
 
-evaluator = evaluatorBuilder.build()
+evaluator = evaluatorBuilder.build() \
+	.verify()
 ```
 
 Evaluating a single data record:

@@ -23,6 +23,10 @@ class Evaluator(JavaObject):
 		super(Evaluator, self).__init__(gateway)
 		self.javaEvaluator = javaEvaluator
 
+	def verify(self):
+		self.javaEvaluator.verify()
+		return self
+
 	def evaluate(self, arguments):
 		jvm = self._jvm()
 		javaArguments = jvm.java.util.LinkedHashMap()

@@ -24,7 +24,8 @@ class EvaluatorTest(TestCase):
 			.setDefaultVisitorBattery() \
 			.loadFile(_resource("DecisionTreeIris.pmml"))
 
-		evaluator = evaluatorBuilder.build()
+		evaluator = evaluatorBuilder.build() \
+			.verify()
 
 		arguments = {
 			"Sepal_Length" : 5.1,
