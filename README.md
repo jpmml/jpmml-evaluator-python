@@ -45,9 +45,11 @@ gateway = launch_gateway()
 Building a model evaluator from a PMML file:
 
 ```python
+from jpmml_evaluator import Evaluator, LoadingModelEvaluatorBuilder
+
 evaluatorBuilder = LoadingModelEvaluatorBuilder(gateway) \
 	.setLocatable(True) \
-	.loadFile(_resource("DecisionTreeIris.pmml"))
+	.loadFile("DecisionTreeIris.pmml")
 
 evaluator = evaluatorBuilder.build()
 ```
