@@ -55,6 +55,19 @@ evaluator = evaluatorBuilder.build() \
 	.verify()
 ```
 
+Printing model schema:
+
+```python
+inputFields = evaluator.getInputFields()
+print("Input fields: " + str([inputField.getName() for inputField in inputFields]))
+
+targetFields = evaluator.getTargetFields()
+print("Target field(s): " + str([targetField.getName() for targetField in targetFields]))
+
+outputFields = evaluator.getOutputFields()
+print("Output fields: " + str([outputField.getName() for outputField in outputFields]))
+```
+
 Evaluating a single data record:
 
 ```python

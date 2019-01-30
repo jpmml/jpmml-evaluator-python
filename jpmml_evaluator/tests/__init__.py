@@ -27,6 +27,16 @@ class EvaluatorTest(TestCase):
 		evaluator = evaluatorBuilder.build() \
 			.verify()
 
+		self.assertEqual(4, len(evaluator.getInputFields()))
+		self.assertEqual(1, len(evaluator.getTargetFields()))
+		self.assertEqual(4, len(evaluator.getOutputFields()))
+
+		targetField = evaluator.getTargetFields()[0]
+
+		self.assertEqual("Species", targetField.getName())
+		self.assertEqual("string", targetField.getDataType())
+		self.assertEqual("categorical", targetField.getOpType())
+
 		arguments = {
 			"Sepal_Length" : 5.1,
 			"Sepal_Width" : 3.5,

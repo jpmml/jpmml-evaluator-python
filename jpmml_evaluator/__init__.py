@@ -17,6 +17,31 @@ class JavaObject(object):
 	def _jvm(self):
 		return self.gateway.jvm
 
+class ModelField(JavaObject):
+
+	def __init__(self, gateway, javaModelField):
+		super(ModelField, self).__init__(gateway)
+		self.javaModelField = javaModelField
+		# Transform Java objects to Python strings
+		self.name = javaModelField.getName().getValue()
+		self.dataType = javaModelField.getDataType().value()
+		self.opType = javaModelField.getOpType().value()
+
+	def __str__(self):
+		return self.javaModelField.toString()
+
+	def getName(self):
+		return self.name
+
+	def getDataType(self):
+		return self.dataType
+
+	def getOpType(self):
+		return self.opType
+
+def _initModelFields(gateway, javaModelFields):
+	return [ModelField(gateway, javaModelField) for javaModelField in javaModelFields]
+
 class Evaluator(JavaObject):
 
 	def __init__(self, gateway, javaEvaluator):
@@ -26,6 +51,21 @@ class Evaluator(JavaObject):
 	def verify(self):
 		self.javaEvaluator.verify()
 		return self
+
+	def getInputFields(self):
+		if not hasattr(self, "inputFields"):
+			self.inputFields = _initModelFields(self.gateway, self.javaEvaluator.getInputFields())
+		return self.inputFields
+
+	def getTargetFields(self):
+		if not hasattr(self, "targetFields"):
+			self.targetFields = _initModelFields(self.gateway, self.javaEvaluator.getTargetFields())
+		return self.targetFields
+
+	def getOutputFields(self):
+		if not hasattr(self, "outputFields"):
+			self.outputFields = _initModelFields(self.gateway, self.javaEvaluator.getOutputFields())
+		return self.outputFields
 
 	def evaluate(self, arguments):
 		jvm = self._jvm()
