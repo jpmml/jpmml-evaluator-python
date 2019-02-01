@@ -19,6 +19,8 @@ setup(
 		"jpmml_evaluator.resources" : ["*.jar"]
 	},
 	install_requires = [
-		"py4j"
+		"Cython",
+		"py4j",
+		"pyjnius"
 	]
 )

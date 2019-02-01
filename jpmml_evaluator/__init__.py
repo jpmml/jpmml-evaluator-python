@@ -4,6 +4,7 @@ from pandas import DataFrame
 from py4j.java_collections import JavaMap
 from py4j.java_gateway import JavaGateway
 
+import jnius_config
 import os
 import pkg_resources
 
@@ -19,6 +20,25 @@ class JavaBackend(object):
 
 	def staticInvoke(self, className, methodName, *args):
 		raise ValueError()
+
+def jnius_configure_classpath(user_classpath = []):
+	jnius_config.set_classpath(*_classpath(user_classpath))
+
+class PyJNIusBackend(JavaBackend):
+
+	def __init__(self):
+		super(PyJNIusBackend, self).__init__()
+
+	def newObject(self, className, *args):
+		from jnius import autoclass
+		javaClass = autoclass(className)
+		return javaClass(*args)
+
+	def staticInvoke(self, className, methodName, *args):
+		from jnius import autoclass
+		javaClass = autoclass(className)
+		javaMember = javaClass.__dict__[methodName]
+		return javaMember(*args)
 
 def launch_gateway(user_classpath = []):
 	return JavaGateway.launch_gateway(classpath = os.pathsep.join(_classpath(user_classpath)))
@@ -66,7 +86,7 @@ class ModelField(JavaObject):
 		return self.opType
 
 def _initModelFields(backend, javaModelFields):
-	return [ModelField(backend, javaModelField) for javaModelField in javaModelFields]
+	return [ModelField(backend, javaModelFields.get(i)) for i in range(javaModelFields.size())]
 
 class Evaluator(JavaObject):
 
@@ -96,10 +116,22 @@ class Evaluator(JavaObject):
 	def evaluate(self, arguments):
 		javaArguments = self.backend.newObject("java.util.LinkedHashMap")
 		for k, v in arguments.items():
-			javaArguments.put(self.backend.staticInvoke("org.dmg.pmml.FieldName", "create", k), v)
+			javaFieldName = self.backend.staticInvoke("org.dmg.pmml.FieldName", "create", k)
+			if isinstance(v, str):
+				javaObject = self.backend.newObject("java.lang.String", v)
+			elif isinstance(v, int):
+				javaObject = self.backend.newObject("java.lang.Integer", v)
+			elif isinstance(v, float):
+				javaObject = self.backend.newObject("java.lang.Double", v)
+			elif isinstance(v, bool):
+				javaObject = self.backend.newObject("java.lang.Boolean", v)
+			else:
+				raise ValueError()
+			javaArguments.put(javaFieldName, javaObject)
 		javaResults = self.javaEvaluator.evaluate(javaArguments)
 		results = self.backend.staticInvoke("org.jpmml.evaluator.EvaluatorUtil", "decode", javaResults)
-		return results
+		pyResults = {entry.getKey() : entry.getValue() for entry in results.entrySet().toArray()}
+		return pyResults
 
 	def evaluateAll(self, arguments_df):
 		argument_records = arguments_df.to_dict(orient = "records")

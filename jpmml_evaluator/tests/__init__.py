@@ -1,26 +1,20 @@
 #!/usr/bin/env python
 
-from jpmml_evaluator import Evaluator, LoadingModelEvaluatorBuilder, ModelEvaluatorBuilder, Py4JBackend
-from jpmml_evaluator import launch_gateway
+from jpmml_evaluator import Evaluator, LoadingModelEvaluatorBuilder, ModelEvaluatorBuilder, PyJNIusBackend, Py4JBackend
+from jpmml_evaluator import jnius_configure_classpath, launch_gateway
 from unittest import TestCase
 
 import os
 import pandas
+
+jnius_configure_classpath()
 
 def _resource(name):
 	return os.path.join(os.path.dirname(__file__), "resources", name)
 
 class EvaluatorTest(TestCase):
 
-	def setUp(self):
-		self.gateway = launch_gateway()
-
-	def tearDown(self):
-		self.gateway.shutdown()
-
-	def test_DecisionTreeIris(self):
-		backend = Py4JBackend(self.gateway)
-
+	def workflow(self, backend):
 		evaluatorBuilder = LoadingModelEvaluatorBuilder(backend) \
 			.setLocatable(True) \
 			.setDefaultVisitorBattery() \
@@ -65,3 +59,21 @@ class EvaluatorTest(TestCase):
 		print(results_df.head(5))
 
 		self.assertEqual((150, 5), results_df.shape)
+
+class PyJNIusEvaluatorTest(EvaluatorTest):
+
+	def test_pyjnius(self):
+		backend = PyJNIusBackend()
+		super(PyJNIusEvaluatorTest, self).workflow(backend)
+
+class Py4JEvaluatorTest(EvaluatorTest):
+
+	def setUp(self):
+		self.gateway = launch_gateway()
+
+	def tearDown(self):
+		self.gateway.shutdown()
+
+	def test_py4j(self):
+		backend = Py4JBackend(self.gateway)
+		super(Py4JEvaluatorTest, self).workflow(backend)
