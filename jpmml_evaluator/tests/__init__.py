@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from jpmml_evaluator import Evaluator, LoadingModelEvaluatorBuilder, ModelEvaluatorBuilder, PyJNIusBackend, Py4JBackend
-from jpmml_evaluator import jnius_configure_classpath, launch_gateway
+from jpmml_evaluator import LoadingModelEvaluatorBuilder
+from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
+from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
 from unittest import TestCase
 
 import os

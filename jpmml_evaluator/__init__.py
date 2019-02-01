@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 
 from pandas import DataFrame
-from py4j.java_collections import JavaMap
-from py4j.java_gateway import JavaGateway
 
-import jnius_config
-import os
 import pkg_resources
 
 from .metadata import __copyright__, __license__, __version__
@@ -20,43 +16,6 @@ class JavaBackend(object):
 
 	def staticInvoke(self, className, methodName, *args):
 		raise ValueError()
-
-def jnius_configure_classpath(user_classpath = []):
-	jnius_config.set_classpath(*_classpath(user_classpath))
-
-class PyJNIusBackend(JavaBackend):
-
-	def __init__(self):
-		super(PyJNIusBackend, self).__init__()
-
-	def newObject(self, className, *args):
-		from jnius import autoclass
-		javaClass = autoclass(className)
-		return javaClass(*args)
-
-	def staticInvoke(self, className, methodName, *args):
-		from jnius import autoclass
-		javaClass = autoclass(className)
-		javaMember = javaClass.__dict__[methodName]
-		return javaMember(*args)
-
-def launch_gateway(user_classpath = []):
-	return JavaGateway.launch_gateway(classpath = os.pathsep.join(_classpath(user_classpath)))
-
-class Py4JBackend(JavaBackend):
-
-	def __init__(self, gateway):
-		super(Py4JBackend, self).__init__()
-		self.gateway = gateway
-
-	def newObject(self, className, *args):
-		javaClass = self.gateway.jvm.__getattr__(className)
-		return javaClass(*args)
-
-	def staticInvoke(self, className, methodName, *args):
-		javaClass = self.gateway.jvm.__getattr__(className)
-		javaMember = javaClass.__getattr__(methodName)
-		return javaMember(*args)
 
 class JavaObject(object):
 

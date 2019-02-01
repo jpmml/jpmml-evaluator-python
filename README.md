@@ -37,7 +37,7 @@ For example, the Java method `org.jpmml.evaluator.Evaluator#evaluate(Map<FieldNa
 Launching a Py4J gateway:
 
 ```python
-from jpmml_evaluator import launch_gateway, Py4JBackend
+from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
 
 gateway = launch_gateway()
 
