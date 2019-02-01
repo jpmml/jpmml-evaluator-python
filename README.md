@@ -32,17 +32,48 @@ Guiding principles:
 
 For example, the Java method `org.jpmml.evaluator.Evaluator#evaluate(Map<FieldName, ?> arguments)` has become a Python method `jpmml_evaluator.Evaluator.evaluate(arguments: dict)`.
 
-### Workflow ###
+### Java backend ###
 
-Launching a Py4J gateway:
+The communication with the JPMML-Evaluator library is managed by a `jpmml_evaluator.JavaBackend` object.
+
+Currently, it's possible to choose between PyJNIus (local JVM via JNI) and Py4J (local or remote JVM via TCP/IP sockets) backends.
+
+Using the [PyJNIus](https://github.com/kivy/pyjnius) backend:
+
+```python
+from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
+
+# Configure JVM
+jnius_configure_classpath()
+
+# Construct a PyJNIus backend
+backend = PyJNIusBackend()
+
+#
+# Do the work
+#
+```
+
+Using the [Py4J](https://github.com/bartdag/py4j) backend:
 
 ```python
 from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
 
+# Launch the gateway
 gateway = launch_gateway()
 
+# Construct a Py4J backend based on the newly launched gateway
 backend = Py4JBackend(gateway)
+
+#
+# Do the PMML work
+#
+
+# Shut down the gateway
+gateway.shutdown()
 ```
+
+### Workflow ###
 
 Building a verified model evaluator from a PMML file:
 
@@ -93,12 +124,6 @@ arguments_df = pandas.read_csv("Iris.csv", sep = ",")
 
 results_df = evaluator.evaluateAll(arguments_df)
 print(results_df)
-```
-
-Shutting down the Py4J gateway:
-
-```python
-gateway.shutdown()
 ```
 
 # License #
