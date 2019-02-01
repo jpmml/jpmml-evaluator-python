@@ -9,18 +9,44 @@ import pkg_resources
 
 from .metadata import __copyright__, __license__, __version__
 
-class JavaObject(object):
+class JavaBackend(object):
+
+	def __init__(self):
+		pass
+
+	def newObject(self, className, *args):
+		raise ValueError()
+
+	def staticInvoke(self, className, methodName, *args):
+		raise ValueError()
+
+def launch_gateway(user_classpath = []):
+	return JavaGateway.launch_gateway(classpath = os.pathsep.join(_classpath(user_classpath)))
+
+class Py4JBackend(JavaBackend):
 
 	def __init__(self, gateway):
+		super(Py4JBackend, self).__init__()
 		self.gateway = gateway
 
-	def _jvm(self):
-		return self.gateway.jvm
+	def newObject(self, className, *args):
+		javaClass = self.gateway.jvm.__getattr__(className)
+		return javaClass(*args)
+
+	def staticInvoke(self, className, methodName, *args):
+		javaClass = self.gateway.jvm.__getattr__(className)
+		javaMember = javaClass.__getattr__(methodName)
+		return javaMember(*args)
+
+class JavaObject(object):
+
+	def __init__(self, backend):
+		self.backend = backend
 
 class ModelField(JavaObject):
 
-	def __init__(self, gateway, javaModelField):
-		super(ModelField, self).__init__(gateway)
+	def __init__(self, backend, javaModelField):
+		super(ModelField, self).__init__(backend)
 		self.javaModelField = javaModelField
 		# Transform Java objects to Python strings
 		self.name = javaModelField.getName().getValue()
@@ -39,13 +65,13 @@ class ModelField(JavaObject):
 	def getOpType(self):
 		return self.opType
 
-def _initModelFields(gateway, javaModelFields):
-	return [ModelField(gateway, javaModelField) for javaModelField in javaModelFields]
+def _initModelFields(backend, javaModelFields):
+	return [ModelField(backend, javaModelField) for javaModelField in javaModelFields]
 
 class Evaluator(JavaObject):
 
-	def __init__(self, gateway, javaEvaluator):
-		super(Evaluator, self).__init__(gateway)
+	def __init__(self, backend, javaEvaluator):
+		super(Evaluator, self).__init__(backend)
 		self.javaEvaluator = javaEvaluator
 
 	def verify(self):
@@ -54,26 +80,25 @@ class Evaluator(JavaObject):
 
 	def getInputFields(self):
 		if not hasattr(self, "inputFields"):
-			self.inputFields = _initModelFields(self.gateway, self.javaEvaluator.getInputFields())
+			self.inputFields = _initModelFields(self.backend, self.javaEvaluator.getInputFields())
 		return self.inputFields
 
 	def getTargetFields(self):
 		if not hasattr(self, "targetFields"):
-			self.targetFields = _initModelFields(self.gateway, self.javaEvaluator.getTargetFields())
+			self.targetFields = _initModelFields(self.backend, self.javaEvaluator.getTargetFields())
 		return self.targetFields
 
 	def getOutputFields(self):
 		if not hasattr(self, "outputFields"):
-			self.outputFields = _initModelFields(self.gateway, self.javaEvaluator.getOutputFields())
+			self.outputFields = _initModelFields(self.backend, self.javaEvaluator.getOutputFields())
 		return self.outputFields
 
 	def evaluate(self, arguments):
-		jvm = self._jvm()
-		javaArguments = jvm.java.util.LinkedHashMap()
+		javaArguments = self.backend.newObject("java.util.LinkedHashMap")
 		for k, v in arguments.items():
-			javaArguments.put(jvm.org.dmg.pmml.FieldName.create(k), v)
+			javaArguments.put(self.backend.staticInvoke("org.dmg.pmml.FieldName", "create", k), v)
 		javaResults = self.javaEvaluator.evaluate(javaArguments)
-		results = jvm.org.jpmml.evaluator.EvaluatorUtil.decode(javaResults)
+		results = self.backend.staticInvoke("org.jpmml.evaluator.EvaluatorUtil", "decode", javaResults)
 		return results
 
 	def evaluateAll(self, arguments_df):
@@ -86,43 +111,39 @@ class Evaluator(JavaObject):
 
 class BaseModelEvaluatorBuilder(JavaObject):
 
-	def __init__(self, gateway, javaModelEvaluatorBuilder):
-		super(BaseModelEvaluatorBuilder, self).__init__(gateway)
+	def __init__(self, backend, javaModelEvaluatorBuilder):
+		super(BaseModelEvaluatorBuilder, self).__init__(backend)
 		self.javaModelEvaluatorBuilder = javaModelEvaluatorBuilder
 
 	def build(self):
 		javaEvaluator = self.javaModelEvaluatorBuilder.build()
-		return Evaluator(self.gateway, javaEvaluator)
+		return Evaluator(self.backend, javaEvaluator)
 
 class ModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 
-	def __init__(self, gateway, javaPMML):
-		javaModelEvaluatorBuilder = gateway.jvm.org.jpmml.evaluator.ModelEvaluatorBuilder(javaPMML)
-		super(ModelEvaluatorBuilder, self).__init__(gateway, javaModelEvaluatorBuilder)
+	def __init__(self, backend, javaPMML):
+		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator.ModelEvaluatorBuilder", javaPMML)
+		super(ModelEvaluatorBuilder, self).__init__(backend, javaModelEvaluatorBuilder)
 
 class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 
-	def __init__(self, gateway):
-		javaModelEvaluatorBuilder = gateway.jvm.org.jpmml.evaluator.LoadingModelEvaluatorBuilder()
-		super(LoadingModelEvaluatorBuilder, self).__init__(gateway, javaModelEvaluatorBuilder)
+	def __init__(self, backend):
+		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator.LoadingModelEvaluatorBuilder")
+		super(LoadingModelEvaluatorBuilder, self).__init__(backend, javaModelEvaluatorBuilder)
 
 	def setLocatable(self, locatable = False):
 		self.javaModelEvaluatorBuilder.setLocatable(locatable)
 		return self
 
 	def setDefaultVisitorBattery(self):
-		jvm = self._jvm()
-		visitors = jvm.org.jpmml.evaluator.DefaultVisitorBattery()
+		visitors = self.backend.newObject("org.jpmml.evaluator.DefaultVisitorBattery")
 		self.javaModelEvaluatorBuilder.setVisitors(visitors)
 		return self
 
 	def loadFile(self, path):
-		jvm = self._jvm()
-		self.javaModelEvaluatorBuilder.load(jvm.java.io.File(path))
+		file = self.backend.newObject("java.io.File", path)
+		self.javaModelEvaluatorBuilder.load(file)
 		return self
-
-def launch_gateway(user_classpath = []):
-	return JavaGateway.launch_gateway(classpath = os.pathsep.join(_classpath(user_classpath)))
 
 def _classpath(user_classpath):
 	return _package_classpath() + user_classpath

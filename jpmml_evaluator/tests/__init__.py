@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from jpmml_evaluator import Evaluator, LoadingModelEvaluatorBuilder, ModelEvaluatorBuilder
+from jpmml_evaluator import Evaluator, LoadingModelEvaluatorBuilder, ModelEvaluatorBuilder, Py4JBackend
 from jpmml_evaluator import launch_gateway
 from unittest import TestCase
 
@@ -19,7 +19,9 @@ class EvaluatorTest(TestCase):
 		self.gateway.shutdown()
 
 	def test_DecisionTreeIris(self):
-		evaluatorBuilder = LoadingModelEvaluatorBuilder(self.gateway) \
+		backend = Py4JBackend(self.gateway)
+
+		evaluatorBuilder = LoadingModelEvaluatorBuilder(backend) \
 			.setLocatable(True) \
 			.setDefaultVisitorBattery() \
 			.loadFile(_resource("DecisionTreeIris.pmml"))

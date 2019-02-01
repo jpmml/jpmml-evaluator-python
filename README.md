@@ -34,12 +34,14 @@ For example, the Java method `org.jpmml.evaluator.Evaluator#evaluate(Map<FieldNa
 
 ### Workflow ###
 
-Launching the Py4J gateway:
+Launching a Py4J gateway:
 
 ```python
-from jpmml_evaluator import launch_gateway
+from jpmml_evaluator import launch_gateway, Py4JBackend
 
 gateway = launch_gateway()
+
+backend = Py4JBackend(gateway)
 ```
 
 Building a verified model evaluator from a PMML file:
@@ -47,7 +49,7 @@ Building a verified model evaluator from a PMML file:
 ```python
 from jpmml_evaluator import Evaluator, LoadingModelEvaluatorBuilder
 
-evaluatorBuilder = LoadingModelEvaluatorBuilder(gateway) \
+evaluatorBuilder = LoadingModelEvaluatorBuilder(backend) \
 	.setLocatable(True) \
 	.loadFile("DecisionTreeIris.pmml")
 
