@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from pandas import DataFrame
 
 import pkg_resources
