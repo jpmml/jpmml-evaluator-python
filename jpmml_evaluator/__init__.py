@@ -75,22 +75,23 @@ class Evaluator(JavaObject):
 	def evaluate(self, arguments):
 		javaArguments = self.backend.newObject("java.util.LinkedHashMap")
 		for k, v in arguments.items():
-			javaFieldName = self.backend.staticInvoke("org.dmg.pmml.FieldName", "create", k)
+			javaKey = self.backend.newObject("java.lang.String", k)
 			if isinstance(v, str):
-				javaObject = self.backend.newObject("java.lang.String", v)
+				javaValue = self.backend.newObject("java.lang.String", v)
 			elif isinstance(v, int):
-				javaObject = self.backend.newObject("java.lang.Integer", v)
+				javaValue = self.backend.newObject("java.lang.Integer", v)
 			elif isinstance(v, float):
-				javaObject = self.backend.newObject("java.lang.Double", v)
+				javaValue = self.backend.newObject("java.lang.Double", v)
 			elif isinstance(v, bool):
-				javaObject = self.backend.newObject("java.lang.Boolean", v)
+				javaValue = self.backend.newObject("java.lang.Boolean", v)
 			else:
 				raise ValueError()
-			javaArguments.put(javaFieldName, javaObject)
+			javaArguments.put(javaKey, javaValue)
+		javaArguments = self.backend.staticInvoke("org.jpmml.evaluator.EvaluatorUtil", "encodeKeys", javaArguments)
 		javaResults = self.javaEvaluator.evaluate(javaArguments)
-		results = self.backend.staticInvoke("org.jpmml.evaluator.EvaluatorUtil", "decode", javaResults)
-		pyResults = {entry.getKey() : entry.getValue() for entry in results.entrySet().toArray()}
-		return pyResults
+		javaResults = self.backend.staticInvoke("org.jpmml.evaluator.EvaluatorUtil", "decodeAll", javaResults)
+		results = {entry.getKey() : entry.getValue() for entry in javaResults.entrySet().toArray()}
+		return results
 
 	def evaluateAll(self, arguments_df):
 		argument_records = arguments_df.to_dict(orient = "records")
