@@ -23,6 +23,7 @@
 			<OutputField name="probability(setosa)" optype="continuous" dataType="double" feature="probability" value="setosa"/>
 			<OutputField name="probability(versicolor)" optype="continuous" dataType="double" feature="probability" value="versicolor"/>
 			<OutputField name="probability(virginica)" optype="continuous" dataType="double" feature="probability" value="virginica"/>
+			<OutputField name="report(probability(versicolor))" optype="categorical" dataType="string" feature="x-report" x-reportField="probability(versicolor)"/>
 		</Output>
 		<Node id="1" score="setosa" recordCount="150.0">
 			<True/>

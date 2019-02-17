@@ -21,12 +21,15 @@ class EvaluatorTest(TestCase):
 			.setDefaultVisitorBattery() \
 			.loadFile(_resource("DecisionTreeIris.pmml"))
 
+		evaluatorBuilder = evaluatorBuilder \
+			.setReportingValueFactoryFactory()
+
 		evaluator = evaluatorBuilder.build() \
 			.verify()
 
 		self.assertEqual(2, len(evaluator.getInputFields()))
 		self.assertEqual(1, len(evaluator.getTargetFields()))
-		self.assertEqual(3, len(evaluator.getOutputFields()))
+		self.assertEqual(4, len(evaluator.getOutputFields()))
 
 		targetField = evaluator.getTargetFields()[0]
 
@@ -45,12 +48,15 @@ class EvaluatorTest(TestCase):
 		results = evaluator.evaluate(arguments)
 		print(results)
 
-		self.assertEqual(4, len(results))
+		self.assertEqual(5, len(results))
 
 		self.assertEqual("setosa", results["Species"])
 		self.assertEqual(1.0, results["probability(setosa)"])
 		self.assertEqual(0.0, results["probability(versicolor)"])
 		self.assertEqual(0.0, results["probability(virginica)"])
+		# See https://github.com/kivy/pyjnius/issues/408
+		#self.assertTrue(results["report(probability(versicolor))"].startswith("<math "))
+		self.assertTrue("report(probability(versicolor))" in results)
 
 		arguments_df = pandas.read_csv(_resource("Iris.csv"), sep = ",")
 		print(arguments_df.head(5))
@@ -58,7 +64,7 @@ class EvaluatorTest(TestCase):
 		results_df = evaluator.evaluateAll(arguments_df)
 		print(results_df.head(5))
 
-		self.assertEqual((150, 4), results_df.shape)
+		self.assertEqual((150, 5), results_df.shape)
 
 class PyJNIusEvaluatorTest(EvaluatorTest):
 

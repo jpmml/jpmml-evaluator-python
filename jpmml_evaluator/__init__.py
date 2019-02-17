@@ -100,6 +100,11 @@ class BaseModelEvaluatorBuilder(JavaObject):
 		super(BaseModelEvaluatorBuilder, self).__init__(backend)
 		self.javaModelEvaluatorBuilder = javaModelEvaluatorBuilder
 
+	def setReportingValueFactoryFactory(self):
+		javaValueFactoryFactory = self.backend.staticInvoke("org.jpmml.evaluator.ReportingValueFactoryFactory", "newInstance")
+		self.javaModelEvaluatorBuilder.setValueFactoryFactory(javaValueFactoryFactory)
+		return self
+
 	def build(self):
 		javaEvaluator = self.javaModelEvaluatorBuilder.build()
 		return Evaluator(self.backend, javaEvaluator)
