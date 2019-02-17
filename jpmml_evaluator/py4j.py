@@ -18,6 +18,15 @@ class Py4JBackend(JavaBackend):
 		javaClass = self.gateway.jvm.__getattr__(className)
 		return javaClass(*args)
 
+	def dict2map(self, pyDict):
+		javaMap = self.newObject("java.util.LinkedHashMap")
+		for k, v in pyDict.items():
+			javaMap.put(k, v)
+		return javaMap
+
+	def map2dict(self, javaMap):
+		return javaMap
+
 	def staticInvoke(self, className, methodName, *args):
 		javaClass = self.gateway.jvm.__getattr__(className)
 		javaMember = javaClass.__getattr__(methodName)

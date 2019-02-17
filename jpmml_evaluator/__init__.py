@@ -14,6 +14,12 @@ class JavaBackend(object):
 	def newObject(self, className, *args):
 		raise ValueError()
 
+	def dict2map(self, pyDict):
+		raise ValueError()
+
+	def map2dict(self, javaMap):
+		raise ValueError()
+
 	def staticInvoke(self, className, methodName, *args):
 		raise ValueError()
 
@@ -73,24 +79,11 @@ class Evaluator(JavaObject):
 		return self.outputFields
 
 	def evaluate(self, arguments):
-		javaArguments = self.backend.newObject("java.util.LinkedHashMap")
-		for k, v in arguments.items():
-			javaKey = self.backend.newObject("java.lang.String", k)
-			if isinstance(v, str):
-				javaValue = self.backend.newObject("java.lang.String", v)
-			elif isinstance(v, int):
-				javaValue = self.backend.newObject("java.lang.Integer", v)
-			elif isinstance(v, float):
-				javaValue = self.backend.newObject("java.lang.Double", v)
-			elif isinstance(v, bool):
-				javaValue = self.backend.newObject("java.lang.Boolean", v)
-			else:
-				raise ValueError()
-			javaArguments.put(javaKey, javaValue)
+		javaArguments = self.backend.dict2map(arguments)
 		javaArguments = self.backend.staticInvoke("org.jpmml.evaluator.EvaluatorUtil", "encodeKeys", javaArguments)
 		javaResults = self.javaEvaluator.evaluate(javaArguments)
 		javaResults = self.backend.staticInvoke("org.jpmml.evaluator.EvaluatorUtil", "decodeAll", javaResults)
-		results = {entry.getKey() : entry.getValue() for entry in javaResults.entrySet().toArray()}
+		results = self.backend.map2dict(javaResults)
 		return results
 
 	def evaluateAll(self, arguments_df):

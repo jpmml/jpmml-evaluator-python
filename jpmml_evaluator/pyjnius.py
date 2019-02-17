@@ -15,6 +15,28 @@ class PyJNIusBackend(JavaBackend):
 		javaClass = autoclass(className)
 		return javaClass(*args)
 
+	def dict2map(self, pyDict):
+		javaMap = self.newObject("java.util.LinkedHashMap")
+		for k, v in pyDict.items():
+			javaKey = self.newObject("java.lang.String", k)
+			if isinstance(v, str):
+				javaValue = self.newObject("java.lang.String", v)
+			elif isinstance(v, int):
+				javaValue = self.newObject("java.lang.Integer", v)
+			elif isinstance(v, float):
+				javaValue = self.newObject("java.lang.Double", v)
+			elif isinstance(v, bool):
+				javaValue = self.newObject("java.lang.Boolean", v)
+			else:
+				raise ValueError()
+			javaMap.put(javaKey, javaValue)
+		return javaMap
+
+	def map2dict(self, javaMap):
+		entries = javaMap.entrySet().toArray()
+		pyDict = {entry.getKey() : entry.getValue() for entry in entries}
+		return pyDict
+
 	def staticInvoke(self, className, methodName, *args):
 		from jnius import autoclass
 		javaClass = autoclass(className)
