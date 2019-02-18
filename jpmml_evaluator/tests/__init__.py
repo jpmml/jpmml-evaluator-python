@@ -44,9 +44,7 @@ class EvaluatorTest(TestCase):
 		self.assertEqual(1.0, results["probability(setosa)"])
 		self.assertEqual(0.0, results["probability(versicolor)"])
 		self.assertEqual(0.0, results["probability(virginica)"])
-		# See https://github.com/kivy/pyjnius/issues/408
-		#self.assertTrue(results["report(probability(versicolor))"].startswith("<math "))
-		self.assertTrue("report(probability(versicolor))" in results)
+		self.assertTrue(results["report(probability(versicolor))"].startswith("<math "))
 
 		arguments_df = pandas.read_csv(_resource("Iris.csv"), sep = ",")
 		print(arguments_df.head(5))
