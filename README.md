@@ -78,13 +78,9 @@ gateway.shutdown()
 Building a verified model evaluator from a PMML file:
 
 ```python
-from jpmml_evaluator import Evaluator, LoadingModelEvaluatorBuilder
+from jpmml_evaluator import make_evaluator
 
-evaluatorBuilder = LoadingModelEvaluatorBuilder(backend) \
-	.setLocatable(True) \
-	.loadFile("DecisionTreeIris.pmml")
-
-evaluator = evaluatorBuilder.build() \
+evaluator = make_evaluator(backend, "DecisionTreeIris.pmml") \
 	.verify()
 ```
 

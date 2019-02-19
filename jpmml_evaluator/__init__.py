@@ -133,6 +133,31 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 		self.javaModelEvaluatorBuilder.load(file)
 		return self
 
+def make_evaluator(backend, path, locatable = False, reporting = False):
+	""" Builds an Evaluator based on a PMML file.
+
+	Parameters:
+	----------
+	backend: JavaBackend
+		The Java backend.
+
+	path: string
+		The path to the PMML file in local filesystem.
+
+	locatable: boolean
+		If True, retain SAX Locator information (if available),
+		which leads to more informative exception messages.
+
+	reporting: boolean
+		If True, activate the reporting Value API.
+	"""
+	evaluatorBuilder = LoadingModelEvaluatorBuilder(backend) \
+		.setLocatable(locatable) \
+		.loadFile(path)
+	if reporting:
+		evaluatorBuilder.setReportingValueFactoryFactory()
+	return evaluatorBuilder.build()
+
 def _classpath(user_classpath):
 	return _package_classpath() + user_classpath
 

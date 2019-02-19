@@ -1,4 +1,4 @@
-from jpmml_evaluator import LoadingModelEvaluatorBuilder
+from jpmml_evaluator import make_evaluator
 from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
 from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
 from unittest import TestCase
@@ -14,15 +14,7 @@ def _resource(name):
 class EvaluatorTest(TestCase):
 
 	def workflow(self, backend):
-		evaluatorBuilder = LoadingModelEvaluatorBuilder(backend) \
-			.setLocatable(True) \
-			.setDefaultVisitorBattery() \
-			.loadFile(_resource("DecisionTreeIris.pmml"))
-
-		evaluatorBuilder = evaluatorBuilder \
-			.setReportingValueFactoryFactory()
-
-		evaluator = evaluatorBuilder.build() \
+		evaluator = make_evaluator(backend, _resource("DecisionTreeIris.pmml"), reporting = True) \
 			.verify()
 
 		self.assertEqual(2, len(evaluator.getInputFields()))
