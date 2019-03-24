@@ -10,16 +10,16 @@ class JavaBackend(object):
 		pass
 
 	def newObject(self, className, *args):
-		raise ValueError()
+		raise NotImplementedError()
 
 	def dict2map(self, pyDict):
-		raise ValueError()
+		raise NotImplementedError()
 
 	def map2dict(self, javaMap):
-		raise ValueError()
+		raise NotImplementedError()
 
 	def staticInvoke(self, className, methodName, *args):
-		raise ValueError()
+		raise NotImplementedError()
 
 class JavaObject(object):
 
