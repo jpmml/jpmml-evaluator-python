@@ -21,6 +21,6 @@ setup(
 	install_requires = [
 		"Cython",
 		"py4j",
-		"pyjnius>=1.2.1"
+		"pyjnius"
 	]
 )
