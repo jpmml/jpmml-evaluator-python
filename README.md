@@ -14,9 +14,16 @@ This package provides Python wrapper classes and functions for the [JPMML-Evalua
 
 # Installation #
 
-Install the latest version from GitHub:
+Installing a release version from PyPI:
+
 ```
-pip install --user --upgrade git+https://github.com/jpmml/jpmml-evaluator-python.git
+pip install jpmml_evaluator
+```
+
+Alternatively, installing the latest snapshot version from GitHub:
+
+```
+pip install --upgrade git+https://github.com/jpmml/jpmml-evaluator-python.git
 ```
 
 # Usage #
@@ -124,10 +131,14 @@ print(results_df)
 
 # License #
 
-JPMML-Evaluator-Python is dual-licensed under the [GNU Affero General Public License (AGPL) version 3.0](https://www.gnu.org/licenses/agpl-3.0.html), and a commercial license.
+JPMML-Evaluator-Python is licensed under the terms and conditions of the [GNU Affero General Public License, Version 3.0](https://www.gnu.org/licenses/agpl-3.0.html).
+For a quick summary of your rights ("Can") and obligations ("Cannot" and "Must") under AGPLv3, please refer to [TLDRLegal](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0)).
+
+If you would like to use JPMML-Evaluator-Python in a proprietary software project, then it is possible to enter into a licensing agreement which makes it available under the terms and conditions of the [BSD 3-Clause License](https://opensource.org/licenses/BSD-3-Clause) instead.
+Please initiate the conversation by submitting the [Request for Quotation](https://openscoring.io/rfq/) web form, or sending an e-mail.
 
 # Additional information #
 
 JPMML-Evaluator-Python is developed and maintained by Openscoring Ltd, Estonia.
 
-Interested in using JPMML software in your application? Please contact [info@openscoring.io](mailto:info@openscoring.io)
+Interested in using JPMML software in your software? Please contact [info@openscoring.io](mailto:info@openscoring.io)
