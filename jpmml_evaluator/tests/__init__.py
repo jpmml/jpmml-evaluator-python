@@ -3,6 +3,7 @@ from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
 from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
 from unittest import TestCase
 
+import numpy
 import os
 import pandas
 
@@ -25,6 +26,16 @@ class EvaluatorTest(TestCase):
 		pyJavaDict = backend.map2dict(javaMap)
 
 		self.assertDictEqual(pyDict, pyJavaDict)
+
+		numpyDict = {
+			"int8" : numpy.int8(1),
+			"int16" : numpy.int16(1),
+			"int32" : numpy.int32(1),
+			"float32" : numpy.float32(1.0),
+			"float64" : numpy.float64(1.0)
+		}
+		
+		javaMap = backend.dict2map(numpyDict)
 
 		evaluator = make_evaluator(backend, _resource("DecisionTreeIris.pmml"), reporting = True) \
 			.verify()
