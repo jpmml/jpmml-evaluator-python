@@ -25,7 +25,7 @@ class Py4JBackend(JavaBackend):
 		return javaMap
 
 	def map2dict(self, javaMap):
-		return javaMap
+		return dict(javaMap)
 
 	def staticInvoke(self, className, methodName, *args):
 		javaClass = self.gateway.jvm.__getattr__(className)

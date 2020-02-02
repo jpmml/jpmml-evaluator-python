@@ -14,6 +14,18 @@ def _resource(name):
 class EvaluatorTest(TestCase):
 
 	def workflow(self, backend):
+		pyDict = {
+			"str" : str("one"),
+			"int" : int(1),
+			"float" : float(1.0),
+			"bool" : bool(True)
+		}
+
+		javaMap = backend.dict2map(pyDict)
+		pyJavaDict = backend.map2dict(javaMap)
+
+		self.assertDictEqual(pyDict, pyJavaDict)
+
 		evaluator = make_evaluator(backend, _resource("DecisionTreeIris.pmml"), reporting = True) \
 			.verify()
 
