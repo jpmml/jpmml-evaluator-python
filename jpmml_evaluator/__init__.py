@@ -99,7 +99,7 @@ class BaseModelEvaluatorBuilder(JavaObject):
 		self.javaModelEvaluatorBuilder = javaModelEvaluatorBuilder
 
 	def setReportingValueFactoryFactory(self):
-		javaValueFactoryFactory = self.backend.staticInvoke("org.jpmml.evaluator.ReportingValueFactoryFactory", "newInstance")
+		javaValueFactoryFactory = self.backend.staticInvoke("org.jpmml.evaluator.reporting.ReportingValueFactoryFactory", "newInstance")
 		self.javaModelEvaluatorBuilder.setValueFactoryFactory(javaValueFactoryFactory)
 		return self
 
@@ -121,11 +121,6 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 
 	def setLocatable(self, locatable = False):
 		self.javaModelEvaluatorBuilder.setLocatable(locatable)
-		return self
-
-	def setDefaultVisitorBattery(self):
-		visitors = self.backend.newObject("org.jpmml.evaluator.DefaultVisitorBattery")
-		self.javaModelEvaluatorBuilder.setVisitors(visitors)
 		return self
 
 	def loadFile(self, path):
