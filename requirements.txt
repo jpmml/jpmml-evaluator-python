@@ -1,0 +1,4 @@
+pandas
+pyjnius
+py4j
+nose
