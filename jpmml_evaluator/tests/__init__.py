@@ -16,6 +16,7 @@ class EvaluatorTest(TestCase):
 
 	def workflow(self, backend):
 		pyDict = {
+			"missing" : None,
 			"str" : str("one"),
 			"int" : int(1),
 			"float" : float(1.0),

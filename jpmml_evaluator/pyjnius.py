@@ -20,7 +20,9 @@ class PyJNIusBackend(JavaBackend):
 		javaMap = self.newObject("java.util.LinkedHashMap")
 		for k, v in pyDict.items():
 			javaKey = self.newObject("java.lang.String", k)
-			if isinstance(v, str):
+			if v is None:
+				javaValue = None
+			elif isinstance(v, str):
 				javaValue = self.newObject("java.lang.String", v)
 			elif isinstance(v, int):
 				javaValue = self.newObject("java.lang.Integer", v)
