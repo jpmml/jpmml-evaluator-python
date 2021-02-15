@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jpmml</groupId>
 		<artifactId>jpmml-evaluator</artifactId>
-		<version>1.5.11</version>
+		<version>1.5.13</version>
 	</parent>
 
 	<groupId>org.jpmml</groupId>
@@ -55,26 +55,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-evaluator-reporting</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jpmml</groupId>
-			<artifactId>pmml-model-metro</artifactId>
+			<artifactId>pmml-evaluator-metro</artifactId>
 			<exclusions>
-				<exclusion>
-					<groupId>com.sun.xml.fastinfoset</groupId>
-					<artifactId>FastInfoset</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>org.glassfish.jaxb</groupId>
 					<artifactId>txw2</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.jvnet.staxex</groupId>
-					<artifactId>stax-ex</artifactId>
-				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.jpmml</groupId>
+			<artifactId>pmml-evaluator-reporting</artifactId>
 		</dependency>
 	</dependencies>
 
