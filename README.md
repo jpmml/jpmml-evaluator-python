@@ -1,4 +1,4 @@
-JPMML-Evaluator-Python
+JPMML-Evaluator-Python [![Build Status](https://github.com/jpmml/jpmml-evaluator-python/workflows/python/badge.svg)](https://github.com/jpmml/jpmml-evaluator-python/actions?query=workflow%3A%22python%22)
 ======================
 
 PMML evaluator library for Python.
