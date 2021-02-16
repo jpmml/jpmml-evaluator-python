@@ -20,6 +20,7 @@ setup(
 	},
 	install_requires = [
 		"Cython",
+		"pandas",
 		"py4j",
 		"pyjnius>=1.2.1"
 	]
