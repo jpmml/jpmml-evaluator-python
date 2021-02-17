@@ -78,9 +78,7 @@ class Evaluator(JavaObject):
 
 	def evaluate(self, arguments):
 		javaArguments = self.backend.dict2map(arguments)
-		javaArguments = self.backend.staticInvoke("org.jpmml.evaluator.EvaluatorUtil", "encodeKeys", javaArguments)
-		javaResults = self.javaEvaluator.evaluate(javaArguments)
-		javaResults = self.backend.staticInvoke("org.jpmml.evaluator.EvaluatorUtil", "decodeAll", javaResults)
+		javaResults = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluate", self.javaEvaluator, javaArguments)
 		results = self.backend.map2dict(javaResults)
 		return results
 
