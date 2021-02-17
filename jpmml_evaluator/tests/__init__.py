@@ -12,31 +12,36 @@ jnius_configure_classpath()
 def _resource(name):
 	return os.path.join(os.path.dirname(__file__), "resources", name)
 
+def _argumentsToResults(backend, arguments):
+	arguments = backend.dumps(arguments)
+	results = backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "argumentsToResults", arguments)
+	results = backend.loads(results)
+	return results
+
 class EvaluatorTest(TestCase):
 
 	def workflow(self, backend):
-		pyDict = {
+		pyArguments = {
 			"missing" : None,
 			"str" : str("one"),
 			"int" : int(1),
 			"float" : float(1.0),
 			"bool" : bool(True)
 		}
+		pyResults = _argumentsToResults(backend, pyArguments)
 
-		javaMap = backend.dict2map(pyDict)
-		pyJavaDict = backend.map2dict(javaMap)
+		self.assertDictEqual(pyArguments, pyResults)
 
-		self.assertDictEqual(pyDict, pyJavaDict)
-
-		numpyDict = {
+		numpyArguments = {
 			"int8" : numpy.int8(1),
 			"int16" : numpy.int16(1),
 			"int32" : numpy.int32(1),
 			"float32" : numpy.float32(1.0),
 			"float64" : numpy.float64(1.0)
 		}
-		
-		javaMap = backend.dict2map(numpyDict)
+		numpyResults = _argumentsToResults(backend, numpyArguments)
+
+		self.assertDictEqual({"int8" : 1, "int16" : 1, "int32" : 1, "float32" : float(1.0), "float64" : float(1.0)}, numpyResults)
 
 		evaluator = make_evaluator(backend, _resource("DecisionTreeIris.pmml"), reporting = True) \
 			.verify()

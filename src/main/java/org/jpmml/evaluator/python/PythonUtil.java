@@ -20,14 +20,20 @@ package org.jpmml.evaluator.python;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.razorvine.pickle.Pickler;
 import net.razorvine.pickle.Unpickler;
+import net.razorvine.pickle.objects.ClassDict;
+import numpy.core.Scalar;
+import numpy.core.ScalarUtil;
 import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.Evaluator;
 import org.jpmml.evaluator.EvaluatorUtil;
+import org.jpmml.python.PickleUtil;
 
 public class PythonUtil {
 
@@ -67,11 +73,72 @@ public class PythonUtil {
 
 	static
 	public Map<String, ?> evaluate(Evaluator evaluator, Map<String, ?> arguments){
-		Map<FieldName, ?> pmmlArguments = EvaluatorUtil.encodeKeys(arguments);
+		Map<FieldName, Object> pmmlArguments = new LinkedHashMap<>();
+
+		Collection<? extends Map.Entry<String, ?>> entries = arguments.entrySet();
+		for(Map.Entry<String, ?> entry : entries){
+			String key = entry.getKey();
+			Object value = entry.getValue();
+
+			pmmlArguments.put(key != null ? FieldName.create(key) : null, toJavaPrimitive(value));
+		}
 
 		Map<FieldName, ?> pmmlResults = evaluator.evaluate(pmmlArguments);
 
 		return EvaluatorUtil.decodeAll(pmmlResults);
+	}
+
+	static
+	public byte[] argumentsToResults(byte[] dictBytes) throws IOException {
+		Map<String, ?> arguments = (Map)unpickle(dictBytes);
+
+		Map<String, Object> results = new LinkedHashMap<>();
+
+		Collection<? extends Map.Entry<String, ?>> entries = arguments.entrySet();
+		for(Map.Entry<String, ?> entry : entries){
+			String key = entry.getKey();
+			Object value = entry.getValue();
+
+			results.put(key, toJavaPrimitive(value));
+		}
+
+		return pickle(results);
+	}
+
+	static
+	public Object toJavaPrimitive(Object value){
+
+		if(value == null){
+			return value;
+		} // End if
+
+		if(value instanceof String){
+			return value;
+		} else
+
+		if(value instanceof Boolean){
+			return value;
+		} else
+
+		if(value instanceof Number){
+			return value;
+		} else
+
+		if(value instanceof Scalar){
+			Scalar scalar = (Scalar)value;
+
+			return ScalarUtil.decode(scalar);
+		} else
+
+		if(value instanceof ClassDict){
+			ClassDict classDict = (ClassDict)value;
+
+			throw new IllegalArgumentException("Python type " + classDict.getClassName() + " is not supported");
+		} else
+
+		{
+			throw new IllegalArgumentException("Java type " + (value.getClass()).getName() + " is not supported");
+		}
 	}
 
 	static
@@ -86,5 +153,9 @@ public class PythonUtil {
 		Pickler pickler = new Pickler();
 
 		return pickler.dumps(object);
+	}
+
+	static {
+		PickleUtil.init("python2pmml.properties");
 	}
 }

@@ -69,14 +69,27 @@
 		</dependency>
 
 		<dependency>
-			<groupId>net.razorvine</groupId>
-			<artifactId>pickle</artifactId>
-			<version>1.1</version>
+			<groupId>org.jpmml</groupId>
+			<artifactId>jpmml-python</artifactId>
+			<version>1.0.10</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jpmml</groupId>
+					<artifactId>jpmml-converter</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Inherited from org.jpmml:jpmml-converter dependency -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.30</version>
 		</dependency>
 		<dependency>
-			<groupId>net.razorvine</groupId>
-			<artifactId>serpent</artifactId>
-			<version>1.30</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+			<version>1.7.30</version>
 		</dependency>
 	</dependencies>
 

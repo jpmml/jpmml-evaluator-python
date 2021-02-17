@@ -19,12 +19,6 @@ class JavaBackend(object):
 	def newObject(self, className, *args):
 		raise NotImplementedError()
 
-	def dict2map(self, pyDict):
-		raise NotImplementedError()
-
-	def map2dict(self, javaMap):
-		raise NotImplementedError()
-
 	def staticInvoke(self, className, methodName, *args):
 		raise NotImplementedError()
 
