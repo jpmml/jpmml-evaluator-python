@@ -18,8 +18,11 @@
  */
 package org.jpmml.evaluator.python;
 
+import java.io.IOException;
 import java.util.Map;
 
+import net.razorvine.pickle.Pickler;
+import net.razorvine.pickle.Unpickler;
 import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.Evaluator;
 import org.jpmml.evaluator.EvaluatorUtil;
@@ -30,11 +33,34 @@ public class PythonUtil {
 	}
 
 	static
+	public byte[] evaluate(Evaluator evaluator, byte[] dictBytes) throws IOException {
+		Map<String, ?> arguments = (Map)unpickle(dictBytes);
+
+		Map<String, ?> results = evaluate(evaluator, arguments);
+
+		return pickle(results);
+	}
+
+	static
 	public Map<String, ?> evaluate(Evaluator evaluator, Map<String, ?> arguments){
 		Map<FieldName, ?> pmmlArguments = EvaluatorUtil.encodeKeys(arguments);
 
 		Map<FieldName, ?> pmmlResults = evaluator.evaluate(pmmlArguments);
 
 		return EvaluatorUtil.decodeAll(pmmlResults);
+	}
+
+	static
+	private Object unpickle(byte[] bytes) throws IOException {
+		Unpickler unpickler = new Unpickler();
+
+		return unpickler.loads(bytes);
+	}
+
+	static
+	private byte[] pickle(Object object) throws IOException {
+		Pickler pickler = new Pickler();
+
+		return pickler.dumps(object);
 	}
 }

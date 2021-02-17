@@ -11,6 +11,11 @@ class PyJNIusBackend(JavaBackend):
 	def __init__(self):
 		super(PyJNIusBackend, self).__init__()
 
+	def loads(self, results):
+		# Unpack jnius.ByteArray to byte array
+		results = bytearray(results[:])
+		return super(PyJNIusBackend, self).loads(results)
+
 	def newObject(self, className, *args):
 		from jnius import autoclass
 		javaClass = autoclass(className)

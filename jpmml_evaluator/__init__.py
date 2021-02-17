@@ -1,5 +1,6 @@
 from pandas import DataFrame
 
+import pickle
 import pkg_resources
 
 from .metadata import __copyright__, __license__, __version__
@@ -8,6 +9,12 @@ class JavaBackend(object):
 
 	def __init__(self):
 		pass
+
+	def dumps(self, arguments):
+		return pickle.dumps(arguments, protocol = 2)
+
+	def loads(self, results):
+		return pickle.loads(results)
 
 	def newObject(self, className, *args):
 		raise NotImplementedError()
@@ -77,9 +84,9 @@ class Evaluator(JavaObject):
 		return self.outputFields
 
 	def evaluate(self, arguments):
-		javaArguments = self.backend.dict2map(arguments)
-		javaResults = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluate", self.javaEvaluator, javaArguments)
-		results = self.backend.map2dict(javaResults)
+		arguments = self.backend.dumps(arguments)
+		results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluate", self.javaEvaluator, arguments)
+		results = self.backend.loads(results)
 		return results
 
 	def evaluateAll(self, arguments_df):
