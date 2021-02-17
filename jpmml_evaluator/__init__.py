@@ -151,13 +151,16 @@ def make_evaluator(backend, path, locatable = False, reporting = False):
 		evaluatorBuilder.setReportingValueFactoryFactory()
 	return evaluatorBuilder.build()
 
+def _package_data_jars(package_data_dir):
+	jars = []
+	resources = pkg_resources.resource_listdir(package_data_dir, "")
+	for resource in resources:
+		if resource.endswith(".jar"):
+			jars.append(pkg_resources.resource_filename(package_data_dir, resource))
+	return jars
+
 def _classpath(user_classpath):
 	return _package_classpath() + user_classpath
 
 def _package_classpath():
-	jars = []
-	resources = pkg_resources.resource_listdir("jpmml_evaluator.resources", "")
-	for resource in resources:
-		if resource.endswith(".jar"):
-			jars.append(pkg_resources.resource_filename("jpmml_evaluator.resources", resource))
-	return jars
+	return _package_data_jars("jpmml_evaluator.resources") + _package_data_jars("jpmml_evaluator.dependencies")

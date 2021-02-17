@@ -13,9 +13,11 @@ setup(
 	license = __license__,
 	packages = [
 		"jpmml_evaluator",
+		"jpmml_evaluator.dependencies",
 		"jpmml_evaluator.resources",
 	],
 	package_data = {
+		"jpmml_evaluator.dependencies" : ["*.jar"],
 		"jpmml_evaluator.resources" : ["*.jar"]
 	},
 	install_requires = [
