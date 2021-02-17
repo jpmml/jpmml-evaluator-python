@@ -19,6 +19,8 @@
 package org.jpmml.evaluator.python;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import net.razorvine.pickle.Pickler;
@@ -30,6 +32,28 @@ import org.jpmml.evaluator.EvaluatorUtil;
 public class PythonUtil {
 
 	private PythonUtil(){
+	}
+
+	static
+	public byte[] evaluateAll(Evaluator evaluator, byte[] listOfDictsBytes) throws IOException {
+		List<Map<String, ?>> batchedArguments = (List)unpickle(listOfDictsBytes);
+
+		List<Map<String, ?>> batchedResults = evaluateAll(evaluator, batchedArguments);
+
+		return pickle(batchedResults);
+	}
+
+	static
+	public List<Map<String, ?>> evaluateAll(Evaluator evaluator, List<Map<String, ?>> batchedArguments){
+		List<Map<String, ?>> batchedResults = new ArrayList<>();
+
+		for(Map<String, ?> arguments : batchedArguments){
+			Map<String, ?> results = evaluate(evaluator, arguments);
+
+			batchedResults.add(results);
+		}
+
+		return batchedResults;
 	}
 
 	static

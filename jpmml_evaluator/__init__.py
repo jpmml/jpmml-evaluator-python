@@ -91,10 +91,9 @@ class Evaluator(JavaObject):
 
 	def evaluateAll(self, arguments_df):
 		argument_records = arguments_df.to_dict(orient = "records")
-		result_records = []
-		for argument_record in argument_records:
-			result_record = self.evaluate(argument_record)
-			result_records.append(result_record)
+		argument_records = self.backend.dumps(argument_records)
+		result_records = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, argument_records)
+		result_records = self.backend.loads(result_records)
 		return DataFrame.from_records(result_records)
 
 class BaseModelEvaluatorBuilder(JavaObject):
