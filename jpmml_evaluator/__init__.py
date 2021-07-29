@@ -107,14 +107,14 @@ class BaseModelEvaluatorBuilder(JavaObject):
 
 class ModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 
-	def __init__(self, backend, javaPMML):
-		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator.ModelEvaluatorBuilder", javaPMML)
+	def __init__(self, backend, javaPMML, lax = False):
+		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator." + str("python.Lax" if lax else "") + "ModelEvaluatorBuilder", javaPMML)
 		super(ModelEvaluatorBuilder, self).__init__(backend, javaModelEvaluatorBuilder)
 
 class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 
-	def __init__(self, backend):
-		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator.LoadingModelEvaluatorBuilder")
+	def __init__(self, backend, lax = False):
+		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator." + str("python.Lax" if lax else "") + "LoadingModelEvaluatorBuilder")
 		super(LoadingModelEvaluatorBuilder, self).__init__(backend, javaModelEvaluatorBuilder)
 
 	def setLocatable(self, locatable = False):
@@ -126,7 +126,7 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 		self.javaModelEvaluatorBuilder.load(file)
 		return self
 
-def make_evaluator(backend, path, locatable = False, reporting = False):
+def make_evaluator(backend, path, lax = False, locatable = False, reporting = False):
 	""" Builds an Evaluator based on a PMML file.
 
 	Parameters:
@@ -137,6 +137,9 @@ def make_evaluator(backend, path, locatable = False, reporting = False):
 	path: string
 		The path to the PMML file in local filesystem.
 
+	lax: boolean
+		If True, skip model schema sanity checks.
+
 	locatable: boolean
 		If True, retain SAX Locator information (if available),
 		which leads to more informative exception messages.
@@ -144,7 +147,7 @@ def make_evaluator(backend, path, locatable = False, reporting = False):
 	reporting: boolean
 		If True, activate the reporting Value API.
 	"""
-	evaluatorBuilder = LoadingModelEvaluatorBuilder(backend) \
+	evaluatorBuilder = LoadingModelEvaluatorBuilder(backend, lax) \
 		.setLocatable(locatable) \
 		.loadFile(path)
 	if reporting:

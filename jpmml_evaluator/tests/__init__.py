@@ -20,7 +20,7 @@ def _argumentsToResults(backend, arguments):
 
 class EvaluatorTest(TestCase):
 
-	def workflow(self, backend):
+	def workflow(self, backend, lax):
 		pyArguments = {
 			"missing" : None,
 			"str" : str("one"),
@@ -43,7 +43,7 @@ class EvaluatorTest(TestCase):
 
 		self.assertDictEqual({"int8" : 1, "int16" : 1, "int32" : 1, "float32" : float(1.0), "float64" : float(1.0)}, numpyResults)
 
-		evaluator = make_evaluator(backend, _resource("DecisionTreeIris.pmml"), reporting = True) \
+		evaluator = make_evaluator(backend, _resource("DecisionTreeIris.pmml"), lax = lax, reporting = True) \
 			.verify()
 
 		self.assertEqual(2, len(evaluator.getInputFields()))
@@ -87,7 +87,7 @@ class PyJNIusEvaluatorTest(EvaluatorTest):
 
 	def test_pyjnius(self):
 		backend = PyJNIusBackend()
-		super(PyJNIusEvaluatorTest, self).workflow(backend)
+		super(PyJNIusEvaluatorTest, self).workflow(backend, lax = True)
 
 class Py4JEvaluatorTest(EvaluatorTest):
 
@@ -99,4 +99,4 @@ class Py4JEvaluatorTest(EvaluatorTest):
 
 	def test_py4j(self):
 		backend = Py4JBackend(self.gateway)
-		super(Py4JEvaluatorTest, self).workflow(backend)
+		super(Py4JEvaluatorTest, self).workflow(backend, lax = False)
