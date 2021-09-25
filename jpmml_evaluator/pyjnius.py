@@ -1,7 +1,6 @@
 from jpmml_evaluator import _classpath, JavaBackend, JavaError
 
 import jnius_config
-import numpy
 
 def jnius_configure_classpath(user_classpath = []):
 	jnius_config.set_classpath(*_classpath(user_classpath))

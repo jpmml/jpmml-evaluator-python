@@ -4,7 +4,6 @@ from jpmml_evaluator import _classpath, JavaBackend, JavaError
 from py4j.java_gateway import JavaGateway
 from py4j.protocol import Py4JJavaError
 
-import numpy
 import os
 
 def launch_gateway(user_classpath = []):
