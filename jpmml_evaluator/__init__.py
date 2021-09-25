@@ -22,10 +22,29 @@ class JavaBackend(object):
 	def staticInvoke(self, className, methodName, *args):
 		raise NotImplementedError()
 
+	def toJavaError(self, e):
+		return e
+
 class JavaObject(object):
 
 	def __init__(self, backend):
 		self.backend = backend
+
+class JavaError(JavaObject, Exception):
+
+	def __init__(self, backend, className, message, stackTraceElements):
+		super(JavaError, self).__init__(backend)
+		self.className = className
+		self.message = message
+		self.stackTraceElements = stackTraceElements
+
+	def __str__(self):
+		return "{0}: {1}".format(self.className, self.message)
+
+	def isInstance(self, className):
+		clazz = self.backend.staticInvoke("java.lang.Class", "forName", className)
+		selfClazz = self.backend.staticInvoke("java.lang.Class", "forName", self.className)
+		return clazz.isAssignableFrom(selfClazz)
 
 class ModelField(JavaObject):
 
@@ -59,7 +78,10 @@ class Evaluator(JavaObject):
 		self.javaEvaluator = javaEvaluator
 
 	def verify(self):
-		self.javaEvaluator.verify()
+		try:
+			self.javaEvaluator.verify()
+		except Exception as e:
+			raise self.backend.toJavaError(e)
 		return self
 
 	def getInputFields(self):
@@ -79,14 +101,20 @@ class Evaluator(JavaObject):
 
 	def evaluate(self, arguments):
 		arguments = self.backend.dumps(arguments)
-		results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluate", self.javaEvaluator, arguments)
+		try:
+			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluate", self.javaEvaluator, arguments)
+		except Exception as e:
+			raise self.backend.toJavaError(e)
 		results = self.backend.loads(results)
 		return results
 
 	def evaluateAll(self, arguments_df):
 		argument_records = arguments_df.to_dict(orient = "records")
 		argument_records = self.backend.dumps(argument_records)
-		result_records = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, argument_records)
+		try:
+			result_records = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, argument_records)
+		except Exception as e:
+			raise self.backend.toJavaError(e)
 		result_records = self.backend.loads(result_records)
 		return DataFrame.from_records(result_records)
 
@@ -105,7 +133,10 @@ class BaseModelEvaluatorBuilder(JavaObject):
 		self.javaModelEvaluatorBuilder.setCheckSchema(checkSchema)
 
 	def build(self):
-		javaEvaluator = self.javaModelEvaluatorBuilder.build()
+		try:
+			javaEvaluator = self.javaModelEvaluatorBuilder.build()
+		except Exception as e:
+			raise self.backend.toJavaError(e)
 		return Evaluator(self.backend, javaEvaluator)
 
 class ModelEvaluatorBuilder(BaseModelEvaluatorBuilder):

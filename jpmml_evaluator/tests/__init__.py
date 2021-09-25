@@ -1,4 +1,4 @@
-from jpmml_evaluator import make_evaluator
+from jpmml_evaluator import make_evaluator, JavaError
 from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
 from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
 from unittest import TestCase
@@ -55,6 +55,30 @@ class EvaluatorTest(TestCase):
 		self.assertEqual("Species", targetField.getName())
 		self.assertEqual("string", targetField.getDataType())
 		self.assertEqual("categorical", targetField.getOpType())
+
+		arguments = {
+			"Sepal.Length" : "error",
+			"Sepal.Width" : "error",
+			"Petal.Length" : "error",
+			"Petal.Width" : "error"
+		}
+		print(arguments)
+
+		try:
+			results = evaluator.evaluate(arguments)
+
+			self.fail()
+		except JavaError as je:
+			self.assertIsNotNone(je.className)
+			self.assertIsNotNone(je.message)
+			self.assertTrue(len(je.stackTraceElements) > 0)
+			self.assertFalse(je.isInstance("java.lang.String"))
+			self.assertTrue(je.isInstance("org.jpmml.evaluator.InvalidResultException"))
+			self.assertTrue(je.isInstance("org.jpmml.evaluator.EvaluationException"))
+			self.assertFalse(je.isInstance("org.jpmml.evaluator.InvalidMarkupException"))
+			self.assertFalse(je.isInstance("org.jpmml.evaluator.UnsupportedMarkupException"))
+			self.assertTrue(je.isInstance("org.jpmml.evaluator.PMMLException"))
+			self.assertTrue(je.isInstance("java.lang.RuntimeException"))
 
 		arguments = {
 			"Sepal.Length" : 5.1,

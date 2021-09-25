@@ -1,4 +1,4 @@
-from jpmml_evaluator import _classpath, JavaBackend
+from jpmml_evaluator import _classpath, JavaBackend, JavaError
 
 import jnius_config
 import numpy
@@ -22,7 +22,16 @@ class PyJNIusBackend(JavaBackend):
 		return javaClass(*args)
 
 	def staticInvoke(self, className, methodName, *args):
+		if className == "java.lang.Class" and methodName == "forName":
+			from jnius import find_javaclass
+			return find_javaclass(*args)
 		from jnius import autoclass
 		javaClass = autoclass(className)
 		javaMember = javaClass.__dict__[methodName]
 		return javaMember(*args)
+
+	def toJavaError(self, e):
+		from jnius import JavaException
+		if isinstance(e, JavaException):
+			return JavaError(self, e.classname, e.innermessage, e.stacktrace)
+		return e

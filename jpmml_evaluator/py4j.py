@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 
-from jpmml_evaluator import _classpath, JavaBackend
+from jpmml_evaluator import _classpath, JavaBackend, JavaError
 from py4j.java_gateway import JavaGateway
+from py4j.protocol import Py4JJavaError
 
 import numpy
 import os
@@ -23,3 +24,9 @@ class Py4JBackend(JavaBackend):
 		javaClass = self.gateway.jvm.__getattr__(className)
 		javaMember = javaClass.__getattr__(methodName)
 		return javaMember(*args)
+
+	def toJavaError(self, e):
+		if isinstance(e, Py4JJavaError):
+			java_exception = e.java_exception
+			return JavaError(self, java_exception.getClass().getName(), java_exception.getMessage(), java_exception.getStackTrace())
+		return e
