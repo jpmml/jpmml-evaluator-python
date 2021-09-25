@@ -71,7 +71,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>jpmml-python</artifactId>
-			<version>1.0.16</version>
+			<version>1.0.19</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jpmml</groupId>
