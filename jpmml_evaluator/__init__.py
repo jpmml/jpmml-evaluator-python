@@ -101,6 +101,9 @@ class BaseModelEvaluatorBuilder(JavaObject):
 		self.javaModelEvaluatorBuilder.setValueFactoryFactory(javaValueFactoryFactory)
 		return self
 
+	def setCheckSchema(self, checkSchema = True):
+		self.javaModelEvaluatorBuilder.setCheckSchema(checkSchema)
+
 	def build(self):
 		javaEvaluator = self.javaModelEvaluatorBuilder.build()
 		return Evaluator(self.backend, javaEvaluator)
@@ -108,14 +111,16 @@ class BaseModelEvaluatorBuilder(JavaObject):
 class ModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 
 	def __init__(self, backend, javaPMML, lax = False):
-		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator." + str("python.Lax" if lax else "") + "ModelEvaluatorBuilder", javaPMML)
+		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator.ModelEvaluatorBuilder", javaPMML)
 		super(ModelEvaluatorBuilder, self).__init__(backend, javaModelEvaluatorBuilder)
+		self.setCheckSchema(not lax)
 
 class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 
 	def __init__(self, backend, lax = False):
-		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator." + str("python.Lax" if lax else "") + "LoadingModelEvaluatorBuilder")
+		javaModelEvaluatorBuilder = backend.newObject("org.jpmml.evaluator.LoadingModelEvaluatorBuilder")
 		super(LoadingModelEvaluatorBuilder, self).__init__(backend, javaModelEvaluatorBuilder)
+		self.setCheckSchema(not lax)
 
 	def setLocatable(self, locatable = False):
 		self.javaModelEvaluatorBuilder.setLocatable(locatable)
