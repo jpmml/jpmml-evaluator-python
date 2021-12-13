@@ -19,18 +19,19 @@
 package org.jpmml.evaluator.python;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.razorvine.pickle.Pickler;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.Scalar;
 import numpy.core.ScalarUtil;
-import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.Evaluator;
 import org.jpmml.evaluator.EvaluatorUtil;
 import org.jpmml.python.PickleUtil;
@@ -73,17 +74,22 @@ public class PythonUtil {
 
 	static
 	public Map<String, ?> evaluate(Evaluator evaluator, Map<String, ?> arguments){
-		Map<FieldName, Object> pmmlArguments = new LinkedHashMap<>();
+		Map<String, Object> pmmlArguments = new AbstractMap<String, Object>(){
 
-		Collection<? extends Map.Entry<String, ?>> entries = arguments.entrySet();
-		for(Map.Entry<String, ?> entry : entries){
-			String key = entry.getKey();
-			Object value = entry.getValue();
+			@Override
+			public Object get(Object key){
+				Object value = arguments.get(key);
 
-			pmmlArguments.put(key != null ? FieldName.create(key) : null, toJavaPrimitive(value));
-		}
+				return toJavaPrimitive(value);
+			}
 
-		Map<FieldName, ?> pmmlResults = evaluator.evaluate(pmmlArguments);
+			@Override
+			public Set<Entry<String, Object>> entrySet(){
+				throw new UnsupportedOperationException();
+			}
+		};
+
+		Map<String, ?> pmmlResults = evaluator.evaluate(pmmlArguments);
 
 		return EvaluatorUtil.decodeAll(pmmlResults);
 	}

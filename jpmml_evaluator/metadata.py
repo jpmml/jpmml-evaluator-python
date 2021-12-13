@@ -1,3 +1,3 @@
 __copyright__ = "Copyright (c) 2019 Villu Ruusmann"
 __license__ = "GNU Affero General Public License (AGPL) version 3.0"
-__version__ = "0.5.3"
+__version__ = "0.6.0"

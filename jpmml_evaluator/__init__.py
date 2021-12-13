@@ -52,7 +52,7 @@ class ModelField(JavaObject):
 		super(ModelField, self).__init__(backend)
 		self.javaModelField = javaModelField
 		# Transform Java objects to Python strings
-		self.name = javaModelField.getName().getValue()
+		self.name = javaModelField.getName()
 		self.dataType = javaModelField.getDataType().value()
 		self.opType = javaModelField.getOpType().value()
 
