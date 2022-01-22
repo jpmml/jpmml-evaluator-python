@@ -73,11 +73,11 @@ class EvaluatorTest(TestCase):
 			self.assertIsNotNone(je.message)
 			self.assertTrue(len(je.stackTraceElements) > 0)
 			self.assertFalse(je.isInstance("java.lang.String"))
-			self.assertTrue(je.isInstance("org.jpmml.evaluator.InvalidResultException"))
+			self.assertTrue(je.isInstance("org.jpmml.evaluator.ValueCheckException"))
 			self.assertTrue(je.isInstance("org.jpmml.evaluator.EvaluationException"))
-			self.assertFalse(je.isInstance("org.jpmml.evaluator.InvalidMarkupException"))
+			self.assertFalse(je.isInstance("org.jpmml.model.InvalidMarkupException"))
 			self.assertFalse(je.isInstance("org.jpmml.evaluator.UnsupportedMarkupException"))
-			self.assertTrue(je.isInstance("org.jpmml.evaluator.PMMLException"))
+			self.assertTrue(je.isInstance("org.jpmml.model.PMMLException"))
 			self.assertTrue(je.isInstance("java.lang.RuntimeException"))
 
 		arguments = {
