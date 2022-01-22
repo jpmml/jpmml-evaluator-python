@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [3.5, 3.6, 3.7, 3.8, 3.9]
-        java: [8, 11]
+        python: [3.6, 3.7, 3.8, 3.9]
+        java: [8, 11, 17]
 
     steps:
     - uses: actions/checkout@v2
