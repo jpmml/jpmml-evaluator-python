@@ -1,4 +1,4 @@
-Cython==0.29.21
+Cython==0.29.26
 pandas
-py4j==0.10.9.1
-pyjnius==1.3.0
+py4j==0.10.9.3
+pyjnius==1.4.1
