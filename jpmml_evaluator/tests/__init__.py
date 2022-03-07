@@ -76,7 +76,7 @@ class EvaluatorTest(TestCase):
 			self.assertTrue(je.isInstance("org.jpmml.evaluator.ValueCheckException"))
 			self.assertTrue(je.isInstance("org.jpmml.evaluator.EvaluationException"))
 			self.assertFalse(je.isInstance("org.jpmml.model.InvalidMarkupException"))
-			self.assertFalse(je.isInstance("org.jpmml.evaluator.UnsupportedMarkupException"))
+			self.assertFalse(je.isInstance("org.jpmml.model.UnsupportedMarkupException"))
 			self.assertTrue(je.isInstance("org.jpmml.model.PMMLException"))
 			self.assertTrue(je.isInstance("java.lang.RuntimeException"))
 

@@ -162,6 +162,8 @@ public class PythonUtil {
 	}
 
 	static {
-		PickleUtil.init("python2pmml.properties");
+		ClassLoader clazzLoader = PythonUtil.class.getClassLoader();
+
+		PickleUtil.init(clazzLoader, "python2pmml.properties");
 	}
 }
