@@ -43,9 +43,28 @@ For example, the Java method `org.jpmml.evaluator.Evaluator#evaluate(Map<FieldNa
 
 The communication with the JPMML-Evaluator library is managed by a `jpmml_evaluator.JavaBackend` object.
 
-Currently, it's possible to choose between PyJNIus (local JVM via JNI) and Py4J (local or remote JVM via TCP/IP sockets) backends.
+Currently, it's possible to choose between JPype, PyJNIus and Py4J backends.
 
-Using the [PyJNIus](https://github.com/kivy/pyjnius) backend:
+Using the [JPype](https://github.com/jpype-project/jpype) backend (local JVM via JNI):
+
+```python
+from jpmml_evaluator.jpype import start_jvm, shutdown_jvm, JPypeBackend
+
+# Start a JVM
+start_jvm()
+
+# Construct a JPype backend
+backend = JPypeBackend()
+
+#
+# Do the work
+#
+
+# Shutdown the JVM
+shutdown_jvm()
+```
+
+Using the [PyJNIus](https://github.com/kivy/pyjnius) backend (local JVM via JNI):
 
 ```python
 from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
@@ -61,7 +80,7 @@ backend = PyJNIusBackend()
 #
 ```
 
-Using the [Py4J](https://github.com/bartdag/py4j) backend:
+Using the [Py4J](https://github.com/bartdag/py4j) backend (local or remote JVM via TCP/IP sockets):
 
 ```python
 from jpmml_evaluator.py4j import launch_gateway, Py4JBackend

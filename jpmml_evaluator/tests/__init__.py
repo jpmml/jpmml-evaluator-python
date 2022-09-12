@@ -1,4 +1,5 @@
 from jpmml_evaluator import make_evaluator, JavaError
+from jpmml_evaluator.jpype import start_jvm, JPypeBackend
 from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
 from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
 from unittest import TestCase
@@ -6,8 +7,6 @@ from unittest import TestCase
 import numpy
 import os
 import pandas
-
-jnius_configure_classpath()
 
 def _resource(name):
 	return os.path.join(os.path.dirname(__file__), "resources", name)
@@ -107,7 +106,25 @@ class EvaluatorTest(TestCase):
 
 		self.assertEqual((150, 5), results_df.shape)
 
+class JPypeEvaluatorTest(EvaluatorTest):
+
+	def setUp(self):
+		start_jvm()
+
+	def tearDown(self):
+		pass
+
+	def test_jpype(self):
+		backend = JPypeBackend()
+		super(JPypeEvaluatorTest, self).workflow(backend, lax = False)
+
 class PyJNIusEvaluatorTest(EvaluatorTest):
+
+	def setUp(self):
+		jnius_configure_classpath()
+
+	def tearDown(self):
+		pass
 
 	def test_pyjnius(self):
 		backend = PyJNIusBackend()
