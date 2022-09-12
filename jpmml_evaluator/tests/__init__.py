@@ -1,7 +1,4 @@
 from jpmml_evaluator import make_evaluator, JavaError
-from jpmml_evaluator.jpype import start_jvm, JPypeBackend
-from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
-from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
 from unittest import TestCase
 
 import numpy
@@ -105,39 +102,3 @@ class EvaluatorTest(TestCase):
 		print(results_df.head(5))
 
 		self.assertEqual((150, 5), results_df.shape)
-
-class JPypeEvaluatorTest(EvaluatorTest):
-
-	def setUp(self):
-		start_jvm()
-
-	def tearDown(self):
-		pass
-
-	def test_jpype(self):
-		backend = JPypeBackend()
-		super(JPypeEvaluatorTest, self).workflow(backend, lax = False)
-
-class PyJNIusEvaluatorTest(EvaluatorTest):
-
-	def setUp(self):
-		jnius_configure_classpath()
-
-	def tearDown(self):
-		pass
-
-	def test_pyjnius(self):
-		backend = PyJNIusBackend()
-		super(PyJNIusEvaluatorTest, self).workflow(backend, lax = True)
-
-class Py4JEvaluatorTest(EvaluatorTest):
-
-	def setUp(self):
-		self.gateway = launch_gateway()
-
-	def tearDown(self):
-		self.gateway.shutdown()
-
-	def test_py4j(self):
-		backend = Py4JBackend(self.gateway)
-		super(Py4JEvaluatorTest, self).workflow(backend, lax = False)
