@@ -34,4 +34,6 @@ jobs:
         pip install nose
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - run: |
-        nosetests
+        nosetests jpmml_evaluator/tests/jpype.py
+        nosetests jpmml_evaluator/tests/py4j.py
+        nosetests jpmml_evaluator/tests/pyjnius.py
