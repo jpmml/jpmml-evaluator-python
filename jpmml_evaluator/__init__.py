@@ -1,9 +1,21 @@
 from pandas import DataFrame
 
+import numpy
 import pickle
 import pkg_resources
 
 from .metadata import __copyright__, __license__, __version__
+
+def _canonicalize(arguments, nan_as_missing):
+	if nan_as_missing:
+		for key, value in arguments.items():
+			arguments[key] = (None if (isinstance(value, (float, numpy.single, numpy.double)) and numpy.isnan(value)) else value)
+	return arguments
+
+def _canonicalizeAll(arguments_df, nan_as_missing):
+	if nan_as_missing:
+		arguments_df = arguments_df.replace({numpy.NaN: None})
+	return arguments_df
 
 class JavaBackend(object):
 
@@ -99,7 +111,8 @@ class Evaluator(JavaObject):
 			self.outputFields = _initModelFields(self.backend, self.javaEvaluator.getOutputFields())
 		return self.outputFields
 
-	def evaluate(self, arguments):
+	def evaluate(self, arguments, nan_as_missing = True):
+		arguments = _canonicalize(arguments, nan_as_missing = nan_as_missing)
 		arguments = self.backend.dumps(arguments)
 		try:
 			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluate", self.javaEvaluator, arguments)
@@ -108,7 +121,8 @@ class Evaluator(JavaObject):
 		results = self.backend.loads(results)
 		return results
 
-	def evaluateAll(self, arguments_df):
+	def evaluateAll(self, arguments_df, nan_as_missing = True):
+		arguments_df = _canonicalizeAll(arguments_df, nan_as_missing = nan_as_missing)
 		argument_records = arguments_df.to_dict(orient = "records")
 		argument_records = self.backend.dumps(argument_records)
 		try:
