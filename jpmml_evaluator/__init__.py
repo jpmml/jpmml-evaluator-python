@@ -120,6 +120,9 @@ class Evaluator(JavaObject):
 		except Exception as e:
 			raise self.backend.toJavaError(e)
 		results = self.backend.loads(results)
+		if hasattr(self, "dropColumns"):
+			for dropColumn in self.dropColumns:
+				del results[dropColumn]
 		return results
 
 	def evaluateAll(self, arguments_df, nan_as_missing = True):
@@ -131,7 +134,18 @@ class Evaluator(JavaObject):
 		except Exception as e:
 			raise self.backend.toJavaError(e)
 		result_records = self.backend.loads(result_records)
-		return DataFrame.from_records(result_records)
+		results_df = DataFrame.from_records(result_records)
+		if hasattr(self, "dropColumns"):
+			for dropColumn in self.dropColumns:
+				results_df.drop(str(dropColumn), axis = 1, inplace = True)
+		return results_df
+
+	def suppressResultFields(self, resultFields):
+		if resultFields:
+			self.dropColumns = [resultField.getName() for resultField in resultFields]
+		else:
+			if hasattr(self, "dropColumns"):
+				del self.dropColumns
 
 class BaseModelEvaluatorBuilder(JavaObject):
 

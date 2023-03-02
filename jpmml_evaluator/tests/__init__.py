@@ -97,6 +97,16 @@ class EvaluatorTest(TestCase):
 		self.assertEqual(0.0, results["probability(virginica)"])
 		self.assertTrue(results["report(probability(versicolor))"].startswith("<math "))
 
+		evaluator.suppressResultFields([targetField])
+		self.assertTrue(hasattr(evaluator, "dropColumns"))
+
+		results = evaluator.evaluate(arguments)
+
+		self.assertEqual(4, len(results))
+
+		evaluator.suppressResultFields([])
+		self.assertFalse(hasattr(evaluator, "dropColumns"))
+
 		arguments_df = pandas.read_csv(_resource("Iris.csv"), sep = ",")
 		print(arguments_df.head(5))
 
@@ -104,3 +114,11 @@ class EvaluatorTest(TestCase):
 		print(results_df.head(5))
 
 		self.assertEqual((150, 5), results_df.shape)
+
+		evaluator.suppressResultFields([targetField])
+
+		results_df = evaluator.evaluateAll(arguments_df)
+
+		self.assertEqual((150, 4), results_df.shape)
+
+		evaluator.suppressResultFields(None)
