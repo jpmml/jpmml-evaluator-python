@@ -1,12 +1,12 @@
-from jpmml_evaluator import _classpath, JavaBackend, JavaError
-
 import importlib
 
 import jpype
 import jpype.imports
 
+from jpmml_evaluator import _classpath, JavaBackend, JavaError
+
 def start_jvm(user_classpath = []):
-	jpype.startJVM(classpath = _classpath(user_classpath))
+	jpype.startJVM(classpath = _classpath(user_classpath = user_classpath))
 
 def shutdown_jvm():
 	jpype.shutdownJVM()
@@ -15,7 +15,7 @@ class JPypeBackend(JavaBackend):
 
 	def __init__(self):
 		super(JPypeBackend, self).__init__()
-		self.javaClasses_ = dict()
+		self.javaClasses_ = {}
 
 	def _ensure_class(self, className):
 		try:

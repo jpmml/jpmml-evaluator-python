@@ -1,9 +1,9 @@
-from jpmml_evaluator import _classpath, JavaBackend, JavaError
-
 import jnius_config
 
+from jpmml_evaluator import _classpath, JavaBackend, JavaError
+
 def jnius_configure_classpath(user_classpath = []):
-	jnius_config.set_classpath(*_classpath(user_classpath))
+	jnius_config.set_classpath(*_classpath(user_classpath = user_classpath))
 
 class PyJNIusBackend(JavaBackend):
 

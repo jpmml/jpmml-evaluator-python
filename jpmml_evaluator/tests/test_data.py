@@ -1,8 +1,10 @@
-from jpmml_evaluator import _canonicalize, _canonicalizeAll
-from pandas import DataFrame
 from unittest import TestCase
 
+from pandas import DataFrame
+
 import numpy
+
+from jpmml_evaluator import _canonicalize, _canonicalizeAll
 
 class DataTest(TestCase):
 

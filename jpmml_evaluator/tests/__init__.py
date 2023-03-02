@@ -1,9 +1,11 @@
-from jpmml_evaluator import make_evaluator, JavaError
+import os
+
 from unittest import TestCase
 
 import numpy
-import os
 import pandas
+
+from jpmml_evaluator import make_evaluator, JavaError
 
 def _resource(name):
 	return os.path.join(os.path.dirname(__file__), "resources", name)

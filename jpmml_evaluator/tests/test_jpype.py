@@ -1,5 +1,6 @@
-from . import EvaluatorTest
 from jpmml_evaluator.jpype import start_jvm, shutdown_jvm, JPypeBackend
+
+from . import EvaluatorTest
 
 class JPypeEvaluatorTest(EvaluatorTest):
 

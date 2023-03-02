@@ -1,5 +1,6 @@
-from . import EvaluatorTest
 from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
+
+from . import EvaluatorTest
 
 class PyJNIusEvaluatorTest(EvaluatorTest):
 

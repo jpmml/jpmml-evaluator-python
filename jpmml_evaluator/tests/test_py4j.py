@@ -1,5 +1,6 @@
-from . import EvaluatorTest
 from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
+
+from . import EvaluatorTest
 
 class Py4JEvaluatorTest(EvaluatorTest):
 

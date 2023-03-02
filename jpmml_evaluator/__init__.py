@@ -1,7 +1,8 @@
+import pickle
+
 from pandas import DataFrame
 
 import numpy
-import pickle
 import pkg_resources
 
 from .metadata import __copyright__, __license__, __version__

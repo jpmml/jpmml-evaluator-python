@@ -1,13 +1,14 @@
 from __future__ import absolute_import
 
-from jpmml_evaluator import _classpath, JavaBackend, JavaError
+import os
+
 from py4j.java_gateway import JavaGateway
 from py4j.protocol import Py4JJavaError
 
-import os
+from jpmml_evaluator import _classpath, JavaBackend, JavaError
 
 def launch_gateway(user_classpath = []):
-	return JavaGateway.launch_gateway(classpath = os.pathsep.join(_classpath(user_classpath)))
+	return JavaGateway.launch_gateway(classpath = os.pathsep.join(_classpath(user_classpath = user_classpath)))
 
 class Py4JBackend(JavaBackend):
 
