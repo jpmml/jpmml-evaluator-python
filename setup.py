@@ -21,7 +21,7 @@ setup(
 		"jpmml_evaluator.resources" : ["*.jar"]
 	},
 	install_requires = [
-		"Cython",
+		"jpype1",
 		"pandas",
 		"py4j",
 		"pyjnius>=1.2.1"

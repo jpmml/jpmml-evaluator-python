@@ -1,4 +1,3 @@
-Cython==0.29.26
 jpype1==1.4.1
 pandas
 py4j==0.10.9.7
