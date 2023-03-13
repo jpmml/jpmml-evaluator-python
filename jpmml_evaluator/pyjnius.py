@@ -8,6 +8,9 @@ class PyJNIusBackend(JNIBackend):
 
 	@classmethod
 	def ensureJVM(cls):
+		import jnius_config
+		if jnius_config.classpath is None:
+			cls.createJVM()
 		from jnius import autoclass
 		autoclass("org.jpmml.evaluator.python.PythonUtil")
 
