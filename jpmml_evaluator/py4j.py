@@ -7,16 +7,25 @@ from py4j.protocol import Py4JJavaError
 
 from jpmml_evaluator import _classpath, JavaBackend, JavaError
 
-def launch_gateway(user_classpath = []):
-	return JavaGateway.launch_gateway(classpath = os.pathsep.join(_classpath(user_classpath = user_classpath)))
-
 class Py4JBackend(JavaBackend):
 
-	def __init__(self, gateway):
+	gateway = None
+
+
+	def __init__(self, gateway = None):
 		super(Py4JBackend, self).__init__()
 		if not gateway:
-			raise ValueError()
+			gateway = Py4JBackend.gateway
 		self.gateway = gateway
+
+	@classmethod
+	def createGateway(cls, user_classpath = []):
+		cls.gateway = JavaGateway.launch_gateway(classpath = os.pathsep.join(_classpath(user_classpath = user_classpath)))
+
+	@classmethod
+	def destroyGateway(cls):
+		cls.gateway.shutdown()
+		cls.gateway = None
 
 	def _loadJavaClass(self, className):
 		return getattr(self.gateway.jvm, className)
