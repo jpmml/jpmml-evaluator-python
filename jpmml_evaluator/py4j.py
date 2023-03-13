@@ -14,15 +14,20 @@ class Py4JBackend(JavaBackend):
 
 	def __init__(self, gateway):
 		super(Py4JBackend, self).__init__()
+		if not gateway:
+			raise ValueError()
 		self.gateway = gateway
 
+	def _loadJavaClass(self, className):
+		return getattr(self.gateway.jvm, className)
+
 	def newObject(self, className, *args):
-		javaClass = self.gateway.jvm.__getattr__(className)
+		javaClass = self._ensureJavaClass(className)
 		return javaClass(*args)
 
 	def staticInvoke(self, className, methodName, *args):
-		javaClass = self.gateway.jvm.__getattr__(className)
-		javaMember = javaClass.__getattr__(methodName)
+		javaClass = self._ensureJavaClass(className)
+		javaMember = getattr(javaClass, methodName)
 		return javaMember(*args)
 
 	def toJavaError(self, e):

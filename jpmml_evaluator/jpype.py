@@ -9,7 +9,6 @@ class JPypeBackend(JNIBackend):
 
 	def __init__(self):
 		super(JPypeBackend, self).__init__()
-		self.javaClasses_ = {}
 
 	@classmethod
 	def createJVM(cls, user_classpath = []):
@@ -19,20 +18,15 @@ class JPypeBackend(JNIBackend):
 	def destroyJVM(cls):
 		jpype.shutdownJVM()
 
-	def _ensure_class(self, className):
-		try:
-			return self.javaClasses_[className]
-		except KeyError:
-			javaClass = importlib.import_module(className)
-			self.javaClasses_[className] = javaClass
-			return javaClass
+	def _loadJavaClass(self, className):
+		return importlib.import_module(className)
 
 	def newObject(self, className, *args):
-		javaClass = self._ensure_class(className)
+		javaClass = self._ensureJavaClass(className)
 		return javaClass(*args)
 
 	def staticInvoke(self, className, methodName, *args):
-		javaClass = self._ensure_class(className)
+		javaClass = self._ensureJavaClass(className)
 		javaMember = getattr(javaClass, methodName)
 		return javaMember(*args)
 

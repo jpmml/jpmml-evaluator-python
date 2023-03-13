@@ -20,17 +20,19 @@ class PyJNIusBackend(JNIBackend):
 		results = bytearray(results[:])
 		return super(PyJNIusBackend, self).loads(results)
 
-	def newObject(self, className, *args):
+	def _loadJavaClass(self, className):
 		from jnius import autoclass
-		javaClass = autoclass(className)
+		return autoclass(className)
+
+	def newObject(self, className, *args):
+		javaClass = self._ensureJavaClass(className)
 		return javaClass(*args)
 
 	def staticInvoke(self, className, methodName, *args):
 		if className == "java.lang.Class" and methodName == "forName":
 			from jnius import find_javaclass
 			return find_javaclass(*args)
-		from jnius import autoclass
-		javaClass = autoclass(className)
+		javaClass = self._ensureJavaClass(className)
 		javaMember = javaClass.__dict__[methodName]
 		return javaMember(*args)
 

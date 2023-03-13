@@ -22,13 +22,25 @@ def _canonicalizeAll(arguments_df, nan_as_missing):
 class JavaBackend(ABC):
 
 	def __init__(self):
-		pass
+		self.javaClasses_ = {}
 
 	def dumps(self, arguments):
 		return pickle.dumps(arguments, protocol = 2)
 
 	def loads(self, results):
 		return pickle.loads(results)
+
+	def _ensureJavaClass(self, className):
+		try:
+			return self.javaClasses_[className]
+		except KeyError:
+			javaClass = self._loadJavaClass(className)
+			self.javaClasses_[className] = javaClass
+			return javaClass
+
+	@abstractmethod
+	def _loadJavaClass(self, className):
+		raise NotImplementedError()
 
 	@abstractmethod
 	def newObject(self, className, *args):
