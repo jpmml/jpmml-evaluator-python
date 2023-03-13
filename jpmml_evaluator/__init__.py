@@ -1,5 +1,6 @@
 import pickle
 
+from abc import abstractmethod, ABC
 from pandas import DataFrame
 
 import numpy
@@ -18,7 +19,7 @@ def _canonicalizeAll(arguments_df, nan_as_missing):
 		arguments_df = arguments_df.replace({numpy.NaN: None})
 	return arguments_df
 
-class JavaBackend(object):
+class JavaBackend(ABC):
 
 	def __init__(self):
 		pass
@@ -29,12 +30,15 @@ class JavaBackend(object):
 	def loads(self, results):
 		return pickle.loads(results)
 
+	@abstractmethod
 	def newObject(self, className, *args):
 		raise NotImplementedError()
 
+	@abstractmethod
 	def staticInvoke(self, className, methodName, *args):
 		raise NotImplementedError()
 
+	@abstractmethod
 	def toJavaError(self, e):
 		return e
 
