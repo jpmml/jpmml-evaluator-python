@@ -43,7 +43,7 @@ For example, the Java method `org.jpmml.evaluator.Evaluator#evaluate(Map<FieldNa
 
 The communication with the JPMML-Evaluator library is managed by a `jpmml_evaluator.JavaBackend` object.
 
-Currently, it's possible to choose between three backends implementations:
+Currently, it's possible to choose between three backend implementations:
 
 | &nbsp; | JPype | PyJNIus | Py4J |
 |--------|-------|---------|------|
@@ -52,6 +52,10 @@ Currently, it's possible to choose between three backends implementations:
 | Implementation class | `jpmml_evaluator \` `.jpype.JPypeBackend` | `jpmml_evaluator \` `.pyjnius.PyJNIusBackend` | `jpmml_evaluator \` `.py4j.Py4JBackend` |
 | Type | Local JVM via JNI | Local JVM via JNI | Local or remote JVM via TCP/IP sockets |
 | Restartable | No | No | Yes |
+| Timing* for `evaluate(X)` | 8.1 -- 9.4 | 10.8 -- 11.9 | 37.3 -- 40.2 |
+| Timing* for `evaluateAll(X)` | 2.55 -- 2.95 | 2.77 -- 3.18 | 3.27 -- 3.62 |
+
+[*] - Relative timings (smaller is better).
 
 ### Workflow ###
 
