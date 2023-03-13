@@ -42,6 +42,11 @@ class JavaBackend(ABC):
 	def toJavaError(self, e):
 		return e
 
+class JNIBackend(JavaBackend):
+
+	def __init__(self):
+		super(JNIBackend, self).__init__()
+
 class JavaObject(object):
 
 	def __init__(self, backend):
