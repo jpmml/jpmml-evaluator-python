@@ -43,61 +43,15 @@ For example, the Java method `org.jpmml.evaluator.Evaluator#evaluate(Map<FieldNa
 
 The communication with the JPMML-Evaluator library is managed by a `jpmml_evaluator.JavaBackend` object.
 
-Currently, it's possible to choose between JPype, PyJNIus and Py4J backends.
+Currently, it's possible to choose between three backends implementations:
 
-Using the [JPype](https://github.com/jpype-project/jpype) backend (local JVM via JNI):
-
-```python
-from jpmml_evaluator.jpype import start_jvm, shutdown_jvm, JPypeBackend
-
-# Start a JVM
-start_jvm()
-
-# Construct a JPype backend
-backend = JPypeBackend()
-
-#
-# Do the work
-#
-
-# Shutdown the JVM
-shutdown_jvm()
-```
-
-Using the [PyJNIus](https://github.com/kivy/pyjnius) backend (local JVM via JNI):
-
-```python
-from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
-
-# Configure JVM
-jnius_configure_classpath()
-
-# Construct a PyJNIus backend
-backend = PyJNIusBackend()
-
-#
-# Do the work
-#
-```
-
-Using the [Py4J](https://github.com/bartdag/py4j) backend (local or remote JVM via TCP/IP sockets):
-
-```python
-from jpmml_evaluator.py4j import launch_gateway, Py4JBackend
-
-# Launch the gateway
-gateway = launch_gateway()
-
-# Construct a Py4J backend based on the newly launched gateway
-backend = Py4JBackend(gateway)
-
-#
-# Do the PMML work
-#
-
-# Shut down the gateway
-gateway.shutdown()
-```
+| &nbsp; | JPype | PyJNIus | Py4J |
+|--------|-------|---------|------|
+| GitHub project page | [jpype-project/jpype](https://github.com/jpype-project/jpype) | [kivy/pyjnius](https://github.com/kivy/pyjnius) | [bartdag/py4j](https://github.com/bartdag/py4j) |
+| Python package | `jpype1` | `pyjnius` | `py4j` |
+| Implementation class | `jpmml_evaluator \` `.jpype.JPypeBackend` | `jpmml_evaluator \` `.pyjnius.PyJNIusBackend` | `jpmml_evaluator \` `.py4j.Py4JBackend` |
+| Type | Local JVM via JNI | Local JVM via JNI | Local or remote JVM via TCP/IP sockets |
+| Restartable | No | No | Yes |
 
 ### Workflow ###
 
@@ -105,8 +59,9 @@ Building a verified model evaluator from a PMML file:
 
 ```python
 from jpmml_evaluator import make_evaluator
+from jpmml_evaluator.jpype import JPypeBackend
 
-evaluator = make_evaluator(backend, "DecisionTreeIris.pmml") \
+evaluator = make_evaluator(JPypeBackend(), "DecisionTreeIris.pmml") \
 	.verify()
 ```
 
