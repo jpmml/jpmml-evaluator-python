@@ -1,14 +1,14 @@
-from jpmml_evaluator.jpype import start_jvm, shutdown_jvm, JPypeBackend
+from jpmml_evaluator.jpype import JPypeBackend
 
 from . import EvaluatorTest
 
 class JPypeEvaluatorTest(EvaluatorTest):
 
 	def setUp(self):
-		start_jvm()
+		JPypeBackend.createJVM()
 
 	def tearDown(self):
-		shutdown_jvm()
+		JPypeBackend.destroyJVM()
 
 	def test_jpype(self):
 		backend = JPypeBackend()

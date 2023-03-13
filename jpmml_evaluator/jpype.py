@@ -5,17 +5,19 @@ import jpype.imports
 
 from jpmml_evaluator import _classpath, JavaError, JNIBackend
 
-def start_jvm(user_classpath = []):
-	jpype.startJVM(classpath = _classpath(user_classpath = user_classpath))
-
-def shutdown_jvm():
-	jpype.shutdownJVM()
-
 class JPypeBackend(JNIBackend):
 
 	def __init__(self):
 		super(JPypeBackend, self).__init__()
 		self.javaClasses_ = {}
+
+	@classmethod
+	def createJVM(cls, user_classpath = []):
+		jpype.startJVM(classpath = _classpath(user_classpath = user_classpath))
+
+	@classmethod
+	def destroyJVM(cls):
+		jpype.shutdownJVM()
 
 	def _ensure_class(self, className):
 		try:

@@ -1,14 +1,19 @@
-import jnius_config
-
 from jpmml_evaluator import _classpath, JavaError, JNIBackend
-
-def jnius_configure_classpath(user_classpath = []):
-	jnius_config.set_classpath(*_classpath(user_classpath = user_classpath))
 
 class PyJNIusBackend(JNIBackend):
 
 	def __init__(self):
 		super(PyJNIusBackend, self).__init__()
+
+	@classmethod
+	def createJVM(cls, user_classpath = []):
+		import jnius_config
+
+		jnius_config.set_classpath(*_classpath(user_classpath = user_classpath))
+
+	@classmethod
+	def destroyJVM(cls):
+		pass
 
 	def loads(self, results):
 		# Unpack jnius.ByteArray to byte array

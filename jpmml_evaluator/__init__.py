@@ -1,6 +1,6 @@
 import pickle
 
-from abc import abstractmethod, ABC
+from abc import abstractmethod, abstractclassmethod, ABC
 from pandas import DataFrame
 
 import numpy
@@ -46,6 +46,14 @@ class JNIBackend(JavaBackend):
 
 	def __init__(self):
 		super(JNIBackend, self).__init__()
+
+	@abstractclassmethod
+	def createJVM(cls, user_classpath = []):
+		raise NotImplementedError()
+
+	@abstractclassmethod
+	def destroyJVM(cls):
+		raise NotImplementedError()
 
 class JavaObject(object):
 

@@ -1,14 +1,14 @@
-from jpmml_evaluator.pyjnius import jnius_configure_classpath, PyJNIusBackend
+from jpmml_evaluator.pyjnius import PyJNIusBackend
 
 from . import EvaluatorTest
 
 class PyJNIusEvaluatorTest(EvaluatorTest):
 
 	def setUp(self):
-		jnius_configure_classpath()
+		PyJNIusBackend.createJVM()
 
 	def tearDown(self):
-		pass
+		PyJNIusBackend.destroyJVM()
 
 	def test_pyjnius(self):
 		backend = PyJNIusBackend()
