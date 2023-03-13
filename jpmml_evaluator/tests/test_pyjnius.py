@@ -11,5 +11,4 @@ class PyJNIusEvaluatorTest(EvaluatorTest):
 		PyJNIusBackend.destroyJVM()
 
 	def test_pyjnius(self):
-		backend = PyJNIusBackend()
-		super(PyJNIusEvaluatorTest, self).workflow(backend, lax = True)
+		super(PyJNIusEvaluatorTest, self).workflow(PyJNIusBackend(), lax = True)

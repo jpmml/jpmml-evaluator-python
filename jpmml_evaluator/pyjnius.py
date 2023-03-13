@@ -4,6 +4,12 @@ class PyJNIusBackend(JNIBackend):
 
 	def __init__(self):
 		super(PyJNIusBackend, self).__init__()
+		PyJNIusBackend.ensureJVM()
+
+	@classmethod
+	def ensureJVM(cls):
+		from jnius import autoclass
+		autoclass("org.jpmml.evaluator.python.PythonUtil")
 
 	@classmethod
 	def createJVM(cls, user_classpath = []):

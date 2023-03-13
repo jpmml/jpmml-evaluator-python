@@ -60,6 +60,10 @@ class JNIBackend(JavaBackend):
 		super(JNIBackend, self).__init__()
 
 	@abstractclassmethod
+	def ensureJVM(cls):
+		raise NotImplementedError()
+
+	@abstractclassmethod
 	def createJVM(cls, user_classpath = []):
 		raise NotImplementedError()
 

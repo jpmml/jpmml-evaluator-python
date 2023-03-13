@@ -15,8 +15,15 @@ class Py4JBackend(JavaBackend):
 	def __init__(self, gateway = None):
 		super(Py4JBackend, self).__init__()
 		if not gateway:
-			gateway = Py4JBackend.gateway
+			gateway = Py4JBackend.ensureGateway()
 		self.gateway = gateway
+
+	@classmethod
+	def ensureGateway(cls):
+		if not cls.gateway:
+			createGateway(cls)
+		getattr(cls.gateway.jvm, "org.jpmml.evaluator.python.PythonUtil")
+		return cls.gateway
 
 	@classmethod
 	def createGateway(cls, user_classpath = []):
