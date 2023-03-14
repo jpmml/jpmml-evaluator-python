@@ -175,6 +175,9 @@ class Evaluator(JavaObject):
 				results_df.drop(str(dropColumn), axis = 1, inplace = True)
 		return results_df
 
+	def predict(self, X):
+		return self.evaluateAll(X)
+
 	def suppressResultFields(self, resultFields):
 		if resultFields:
 			self.dropColumns = [resultField.getName() for resultField in resultFields]
