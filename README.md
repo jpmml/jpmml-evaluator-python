@@ -64,9 +64,8 @@ Building a verified model evaluator from a PMML file:
 
 ```python
 from jpmml_evaluator import make_evaluator
-from jpmml_evaluator.jpype import JPypeBackend
 
-evaluator = make_evaluator("DecisionTreeIris.pmml", JPypeBackend()) \
+evaluator = make_evaluator("DecisionTreeIris.pmml") \
 	.verify()
 ```
 

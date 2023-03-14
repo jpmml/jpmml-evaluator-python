@@ -74,6 +74,8 @@ class JNIBackend(JavaBackend):
 class JavaObject(object):
 
 	def __init__(self, backend):
+		if not isinstance(backend, JavaBackend):
+			raise TypeError()
 		self.backend = backend
 
 class JavaError(JavaObject, Exception):
@@ -238,9 +240,9 @@ def make_backend(alias):
 		return Py4JBackend()
 	else:
 		aliases = ["jpype", "pyjnius", "py4j"]
-		raise ValueError("{0} not in {1}".format(alias, aliases))
+		raise ValueError("Java backend alias {0} not in {1}".format(alias, aliases))
 
-def make_evaluator(path, backend, lax = False, locatable = False, reporting = False):
+def make_evaluator(path, backend = "jpype", lax = False, locatable = False, reporting = False):
 	""" Builds an Evaluator based on a PMML file.
 
 	Parameters:
@@ -248,8 +250,8 @@ def make_evaluator(path, backend, lax = False, locatable = False, reporting = Fa
 	path: string
 		The path to the PMML file in local filesystem.
 
-	backend: JavaBackend
-		The Java backend.
+	backend: JavaBackend or string
+		The Java backend or its alias
 
 	lax: boolean
 		If True, skip model schema sanity checks.
@@ -261,6 +263,14 @@ def make_evaluator(path, backend, lax = False, locatable = False, reporting = Fa
 	reporting: boolean
 		If True, activate the reporting Value API.
 	"""
+
+	if isinstance(backend, JavaBackend):
+		pass
+	elif isinstance(backend, str):
+		backend = make_backend(backend)
+	else:
+		raise TypeError()
+
 	evaluatorBuilder = LoadingModelEvaluatorBuilder(backend, lax) \
 		.setLocatable(locatable) \
 		.loadFile(path)
