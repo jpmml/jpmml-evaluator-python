@@ -5,7 +5,7 @@ from unittest import TestCase
 import numpy
 import pandas
 
-from jpmml_evaluator import make_evaluator, JavaError
+from jpmml_evaluator import make_backend, make_evaluator, JavaError
 
 def _resource(name):
 	return os.path.join(os.path.dirname(__file__), "resources", name)
@@ -19,6 +19,10 @@ def _argumentsToResults(backend, arguments):
 class EvaluatorTest(TestCase):
 
 	def workflow(self, backend, lax):
+
+		if isinstance(backend, str):
+			backend = make_backend(backend)
+
 		pyArguments = {
 			"missing" : None,
 			"str" : str("one"),

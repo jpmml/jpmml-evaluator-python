@@ -224,6 +224,22 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 		self.javaModelEvaluatorBuilder.load(file)
 		return self
 
+def make_backend(alias):
+	if not isinstance(alias, str):
+		raise TypeError()
+	if alias.lower() == "jpype":
+		from jpmml_evaluator.jpype import JPypeBackend
+		return JPypeBackend()
+	elif alias.lower() == "pyjnius":
+		from jpmml_evaluator.pyjnius import PyJNIusBackend
+		return PyJNIusBackend()
+	elif alias.lower() == "py4j":
+		from jpmml_evaluator.py4j import Py4JBackend
+		return Py4JBackend()
+	else:
+		aliases = ["jpype", "pyjnius", "py4j"]
+		raise ValueError("{0} not in {1}".format(alias, aliases))
+
 def make_evaluator(backend, path, lax = False, locatable = False, reporting = False):
 	""" Builds an Evaluator based on a PMML file.
 

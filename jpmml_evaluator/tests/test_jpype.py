@@ -11,4 +11,4 @@ class JPypeEvaluatorTest(EvaluatorTest):
 		JPypeBackend.destroyJVM()
 
 	def test_jpype(self):
-		super(JPypeEvaluatorTest, self).workflow(JPypeBackend(), lax = False)
+		super(JPypeEvaluatorTest, self).workflow("jpype", lax = False)

@@ -50,6 +50,7 @@ Currently, it's possible to choose between three backend implementations:
 | GitHub project page | [jpype-project/jpype](https://github.com/jpype-project/jpype) | [kivy/pyjnius](https://github.com/kivy/pyjnius) | [bartdag/py4j](https://github.com/bartdag/py4j) |
 | Python package | `jpype1` | `pyjnius` | `py4j` |
 | Implementation class | `jpmml_evaluator \` `.jpype.JPypeBackend` | `jpmml_evaluator \` `.pyjnius.PyJNIusBackend` | `jpmml_evaluator \` `.py4j.Py4JBackend` |
+| Implementation class alias | `"jpype"` | `"pyjnius"` | `"py4j"` |
 | Type | Local JVM via JNI | Local JVM via JNI | Local or remote JVM via TCP/IP sockets |
 | Restartable | No | No | Yes |
 | Timing* for `evaluate(X)` | 8.1 -- 9.4 | 10.8 -- 11.9 | 37.3 -- 40.2 |

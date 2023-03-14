@@ -11,4 +11,4 @@ class Py4JEvaluatorTest(EvaluatorTest):
 		Py4JBackend.destroyGateway()
 
 	def test_py4j(self):
-		super(Py4JEvaluatorTest, self).workflow(Py4JBackend(), lax = False)
+		super(Py4JEvaluatorTest, self).workflow("py4j", lax = False)
