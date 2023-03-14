@@ -240,16 +240,16 @@ def make_backend(alias):
 		aliases = ["jpype", "pyjnius", "py4j"]
 		raise ValueError("{0} not in {1}".format(alias, aliases))
 
-def make_evaluator(backend, path, lax = False, locatable = False, reporting = False):
+def make_evaluator(path, backend, lax = False, locatable = False, reporting = False):
 	""" Builds an Evaluator based on a PMML file.
 
 	Parameters:
 	----------
-	backend: JavaBackend
-		The Java backend.
-
 	path: string
 		The path to the PMML file in local filesystem.
+
+	backend: JavaBackend
+		The Java backend.
 
 	lax: boolean
 		If True, skip model schema sanity checks.
