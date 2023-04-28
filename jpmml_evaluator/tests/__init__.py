@@ -45,7 +45,7 @@ class EvaluatorTest(TestCase):
 
 		self.assertDictEqual({"int8" : 1, "int16" : 1, "int32" : 1, "float32" : float(1.0), "float64" : float(1.0)}, numpyResults)
 
-		evaluator = make_evaluator(_resource("DecisionTreeIris.pmml"), backend = backend, lax = lax, reporting = True) \
+		evaluator = make_evaluator(_resource("DecisionTreeIris.pmml"), backend = backend, lax = lax, reporting = True, transpile = True) \
 			.verify()
 
 		self.assertEqual(2, len(evaluator.getInputFields()))

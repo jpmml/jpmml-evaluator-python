@@ -229,6 +229,19 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 		self.javaModelEvaluatorBuilder.load(file)
 		return self
 
+	def transform(self, javaPMMLTransformer):
+		self.javaModelEvaluatorBuilder.transform(javaPMMLTransformer)
+		return self
+
+	def transpile(self, path = None):
+		if path:
+			file = self.backend.newObject("java.io.File", path)
+			transpiler = self.backend.newObject("org.jpmml.transpiler.FileTranspiler", None, file)
+		else:
+			transpiler = self.backend.newObject("org.jpmml.transpiler.InMemoryTranspiler", None)
+		transformer = self.backend.newObject("org.jpmml.transpiler.TranspilerTransformer", transpiler)
+		return self.transform(transformer)
+
 def make_backend(alias):
 	if not isinstance(alias, str):
 		raise TypeError()
@@ -245,7 +258,7 @@ def make_backend(alias):
 		aliases = ["jpype", "pyjnius", "py4j"]
 		raise ValueError("Java backend alias {0} not in {1}".format(alias, aliases))
 
-def make_evaluator(path, backend = "jpype", lax = False, locatable = False, reporting = False):
+def make_evaluator(path, backend = "jpype", lax = False, locatable = False, reporting = False, transpile = False):
 	""" Builds an Evaluator based on a PMML file.
 
 	Parameters:
@@ -265,6 +278,9 @@ def make_evaluator(path, backend = "jpype", lax = False, locatable = False, repo
 
 	reporting: boolean
 		If True, activate the reporting Value API.
+
+	transpile: boolean or string
+		If not False, perform transpilation.
 	"""
 
 	if isinstance(backend, JavaBackend):
@@ -279,6 +295,8 @@ def make_evaluator(path, backend = "jpype", lax = False, locatable = False, repo
 		.loadFile(path)
 	if reporting:
 		evaluatorBuilder.setReportingValueFactoryFactory()
+	if transpile:
+		evaluatorBuilder.transpile(transpile if isinstance(transpile, str) else None)
 	return evaluatorBuilder.build()
 
 def _package_data_jars(package_data_dir):
