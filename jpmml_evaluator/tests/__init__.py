@@ -54,6 +54,9 @@ class EvaluatorTest(TestCase):
 
 		targetField = evaluator.getTargetFields()[0]
 
+		probabilityOutputFields = evaluator.getOutputFields()[0:3]
+		reportOutputField = evaluator.getOutputFields()[-1]
+
 		self.assertEqual("Species", targetField.getName())
 		self.assertEqual("string", targetField.getDataType())
 		self.assertEqual("categorical", targetField.getOpType())
@@ -119,10 +122,20 @@ class EvaluatorTest(TestCase):
 
 		self.assertEqual((150, 5), results_df.shape)
 
-		evaluator.suppressResultFields([targetField])
+		evaluator.suppressResultFields([reportOutputField])
 
 		results_df = evaluator.evaluateAll(arguments_df)
 
 		self.assertEqual((150, 4), results_df.shape)
+
+		expected_results_df = pandas.read_csv(_resource("DecisionTreeIris.csv"), sep = ",")
+
+		self.assertEqual(expected_results_df.columns.tolist(), results_df.columns.tolist())
+
+		targetFieldName = targetField.getName()
+		self.assertEqual(expected_results_df[targetFieldName].values.tolist(), results_df[targetFieldName].values.tolist())
+
+		probabilityOutputFieldNames = [probabilityOutputField.getName() for probabilityOutputField in probabilityOutputFields]
+		self.assertTrue(numpy.allclose(expected_results_df[probabilityOutputFieldNames], results_df[probabilityOutputFieldNames], rtol = 1e-13, atol = 1e-13))
 
 		evaluator.suppressResultFields(None)
