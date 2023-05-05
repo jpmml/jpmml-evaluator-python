@@ -162,14 +162,17 @@ class Evaluator(JavaObject):
 
 	def evaluateAll(self, arguments_df, nan_as_missing = True):
 		arguments_df = _canonicalizeAll(arguments_df, nan_as_missing = nan_as_missing)
-		argument_records = arguments_df.to_dict(orient = "records")
-		argument_records = self.backend.dumps(argument_records)
+		arguments_dict = {
+			"columns" : arguments_df.columns.tolist(),
+			"data" : arguments_df.values.tolist()
+		}
+		arguments = self.backend.dumps(arguments_dict)
 		try:
-			result_records = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, argument_records)
+			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, arguments)
 		except Exception as e:
 			raise self.backend.toJavaError(e)
-		result_records = self.backend.loads(result_records)
-		results_df = DataFrame.from_records(result_records)
+		results_dict = self.backend.loads(results)
+		results_df = DataFrame(data = results_dict["data"], columns = results_dict["columns"])
 		if hasattr(self, "dropColumns"):
 			for dropColumn in self.dropColumns:
 				results_df.drop(str(dropColumn), axis = 1, inplace = True)
