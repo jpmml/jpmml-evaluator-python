@@ -1,4 +1,4 @@
 jpype1==1.4.1
 pandas
 py4j==0.10.9.7
-pyjnius==1.4.2
+pyjnius==1.5.0
