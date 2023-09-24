@@ -42,6 +42,12 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.jpmml</groupId>
@@ -67,6 +73,11 @@
 					<groupId>org.jpmml</groupId>
 					<artifactId>pmml-evaluator-testing</artifactId>
 				</exclusion>
+
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -80,6 +91,12 @@
 					<artifactId>pmml-converter</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>32.1.2-jre</version>
 		</dependency>
 
 		<!-- Inherited from org.jpmml:pmml-converter dependency -->
