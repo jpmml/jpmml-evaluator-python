@@ -121,12 +121,19 @@ class EvaluatorTest(TestCase):
 		print(results_df.head(5))
 
 		self.assertEqual((150, 5), results_df.shape)
+		self.assertEqual(arguments_df.index.tolist(), results_df.index.tolist())
+		self.assertIsNot(arguments_df.index, results_df.index)
+
+		arguments_df.set_index(("row_{}".format(row + 1) for row in arguments_df.index.tolist()), inplace = True) 
 
 		evaluator.suppressResultFields([reportOutputField])
 
 		results_df = evaluator.evaluateAll(arguments_df)
 
 		self.assertEqual((150, 4), results_df.shape)
+		self.assertEqual(arguments_df.index.tolist(), results_df.index.tolist())
+		self.assertEqual(["row_1", "row_2", "row_3"], results_df.index.tolist()[0:3])
+		self.assertIsNot(arguments_df.index, results_df.index)
 
 		expected_results_df = pandas.read_csv(_resource("DecisionTreeIris.csv"), sep = ",")
 

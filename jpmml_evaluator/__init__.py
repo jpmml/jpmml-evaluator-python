@@ -172,7 +172,7 @@ class Evaluator(JavaObject):
 		except Exception as e:
 			raise self.backend.toJavaError(e)
 		results_dict = self.backend.loads(results)
-		results_df = DataFrame(data = results_dict["data"], columns = results_dict["columns"])
+		results_df = DataFrame(data = results_dict["data"], index = (arguments_df.index.copy() if (len(arguments_dict["data"]) == len(results_dict["data"])) else None), columns = results_dict["columns"])
 		if hasattr(self, "dropColumns"):
 			for dropColumn in self.dropColumns:
 				results_df.drop(str(dropColumn), axis = 1, inplace = True)
