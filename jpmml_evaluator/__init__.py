@@ -16,7 +16,7 @@ def _canonicalize(arguments, nan_as_missing):
 
 def _canonicalizeAll(arguments_df, nan_as_missing):
 	if nan_as_missing:
-		arguments_df = arguments_df.replace({numpy.NaN: None})
+		arguments_df = arguments_df.replace({numpy.nan: None})
 	return arguments_df
 
 class JavaBackend(ABC):

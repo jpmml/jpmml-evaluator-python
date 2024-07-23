@@ -11,7 +11,7 @@ class DataTest(TestCase):
 	def test_canonicalize(self):
 		arguments = {
 			"A" : int(1),
-			"B" : numpy.NaN,
+			"B" : numpy.nan,
 			"C" : str("3")
 		}
 		arguments = _canonicalize(arguments, nan_as_missing = True)
@@ -21,7 +21,7 @@ class DataTest(TestCase):
 		self.assertEqual(str("3"), arguments["C"])
 
 	def test_canonicalizeAll(self):
-		arguments_df = DataFrame([[int(1)], [numpy.NaN], [str("3")]], columns = ["X"])
+		arguments_df = DataFrame([[int(1)], [numpy.nan], [str("3")]], columns = ["X"])
 		self.assertEqual(object, arguments_df["X"].dtype)
 		arguments_df = _canonicalizeAll(arguments_df, nan_as_missing = True)
 		self.assertEqual((3, 1), arguments_df.shape)
