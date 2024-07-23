@@ -77,7 +77,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-python</artifactId>
-			<version>1.2.3</version>
+			<version>1.2.4</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jpmml</groupId>
