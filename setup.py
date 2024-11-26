@@ -19,6 +19,7 @@ setup(
 	exclude_package_data = {
 		"" : ["README.md"],
 	},
+	python_requires = ">=3.9",
 	install_requires = [
 		"jpype1",
 		"pandas",
