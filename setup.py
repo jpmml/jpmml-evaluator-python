@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import find_packages, setup
 
 exec(open("jpmml_evaluator/metadata.py").read())
 
@@ -11,14 +11,13 @@ setup(
 	url = "https://github.com/jpmml/jpmml-evaluator-python",
 	download_url = "https://github.com/jpmml/jpmml-evaluator-python/archive/" + __version__ + ".tar.gz",
 	license = __license__,
-	packages = [
-		"jpmml_evaluator",
-		"jpmml_evaluator.dependencies",
-		"jpmml_evaluator.resources",
-	],
+	packages = find_packages(exclude = ["*.tests.*", "*.tests"]),
 	package_data = {
 		"jpmml_evaluator.dependencies" : ["*.jar"],
 		"jpmml_evaluator.resources" : ["*.jar"]
+	},
+	exclude_package_data = {
+		"" : ["README.md"],
 	},
 	install_requires = [
 		"jpype1",
