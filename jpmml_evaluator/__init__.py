@@ -1,7 +1,7 @@
-import importlib
 import pickle
 
 from abc import abstractmethod, abstractclassmethod, ABC
+from importlib.resources import files
 from pandas import DataFrame
 
 import numpy
@@ -304,7 +304,7 @@ def make_evaluator(path, backend = "jpype", lax = False, locatable = False, repo
 
 def _package_data_jars(package_data_dir):
 	jars = []
-	resources = importlib.resources.files(package_data_dir).iterdir()
+	resources = files(package_data_dir).iterdir()
 	for resource in resources:
 		resource = resource.resolve()
 		if resource.suffix == ".jar":
