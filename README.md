@@ -10,7 +10,7 @@ This package provides Python wrapper classes and functions for the [JPMML-Evalua
 # Prerequisites #
 
 * Java Platform, Standard Edition 8 or newer.
-* Python 2.7, 3.4 or newer.
+* Python 3.9 or newer.
 
 # Installation #
 
@@ -27,6 +27,35 @@ pip install --upgrade git+https://github.com/jpmml/jpmml-evaluator-python.git
 ```
 
 # Usage #
+
+## Command-line application ##
+
+The `jpmml_evaluator` module is executable.
+The main application loads loads the model from the PMML file, and scores all data records from the input CSV file or stream; scoring results are written to the output CSV file or stream:
+
+```
+python -m jpmml_evaluator DecisionTreeIris.pmml --input Iris.csv --output DecisionTreeIris.csv
+```
+
+If the input CSV file (`-i` or `--input`) and/or the output CSV file (`-o` or `--output`) is not specified, then system input (`sys.stdin`) and system output (`sys.stdout`), respectively, are assumed:
+
+```
+python -m jpmml_evaluator DecisionTreeIris.pmml < Iris.csv > DecisionTreeIris.csv
+```
+
+Getting help:
+
+```
+python -m jpmml_evaluator --help
+```
+
+One some platforms, the [Pip](https://pypi.org/project/pip/) package installer additionally makes the main application available as a top-level command:
+
+```
+jpmml_evaluator DecisionTreeIris.pmml < Iris.csv > DecisionTreeIris.csv
+```
+
+## Library ##
 
 ### Java-to-Python API mapping ###
 
