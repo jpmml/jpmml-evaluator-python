@@ -228,16 +228,17 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 		return self
 
 	def loadFile(self, path):
-		file = self.backend.newObject("java.io.File", path)
-		self.javaModelEvaluatorBuilder.load(file)
+		javaFile = self.backend.newObject("java.io.File", path)
+		self.javaModelEvaluatorBuilder.load(javaFile)
 		return self
 
 	def loadString(self, string):
 		return self.loadBytes(bytes(string, "utf-8"))
 
 	def loadBytes(self, bytes):
-		stream = self.backend.newObject("java.io.ByteArrayInputStream", bytes)
-		self.javaModelEvaluatorBuilder.load(stream)
+		javaInputStream = self.backend.newObject("java.io.ByteArrayInputStream", bytes)
+		self.javaModelEvaluatorBuilder.load(javaInputStream)
+		javaInputStream.close()
 		return self
 
 	def transform(self, javaPMMLTransformer):
@@ -246,12 +247,12 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 
 	def transpile(self, path = None):
 		if path:
-			file = self.backend.newObject("java.io.File", path)
-			transpiler = self.backend.newObject("org.jpmml.transpiler.FileTranspiler", None, file)
+			javaFile = self.backend.newObject("java.io.File", path)
+			javaTranspiler = self.backend.newObject("org.jpmml.transpiler.FileTranspiler", None, javaFile)
 		else:
-			transpiler = self.backend.newObject("org.jpmml.transpiler.InMemoryTranspiler", None)
-		transformer = self.backend.newObject("org.jpmml.transpiler.TranspilerTransformer", transpiler)
-		return self.transform(transformer)
+			javaTranspiler = self.backend.newObject("org.jpmml.transpiler.InMemoryTranspiler", None)
+		javaTranspilerTransformer = self.backend.newObject("org.jpmml.transpiler.TranspilerTransformer", javaTranspiler)
+		return self.transform(javaTranspilerTransformer)
 
 def make_backend(alias):
 	if not isinstance(alias, str):
