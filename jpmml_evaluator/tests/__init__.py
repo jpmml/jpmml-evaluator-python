@@ -1,11 +1,12 @@
 import os
 
+from pathlib import Path
 from unittest import TestCase
 
 import numpy
 import pandas
 
-from jpmml_evaluator import make_backend, make_evaluator, Evaluator, JavaError, LoadingModelEvaluatorBuilder
+from jpmml_evaluator import make_backend, make_evaluator, Evaluator, JavaError
 
 def _resource(name):
 	return os.path.join(os.path.dirname(__file__), "resources", name)
@@ -27,9 +28,15 @@ class EvaluatorBuilderTest(TestCase):
 
 		self.assertIsInstance(resource, str)
 
-		evaluator = LoadingModelEvaluatorBuilder(backend) \
-			.loadFile(resource) \
-			.build()
+		evaluator = make_evaluator(resource, backend = backend)
+
+		self.assertIsInstance(evaluator, Evaluator)
+
+		resource_path = Path(resource)
+
+		self.assertIsInstance(resource_path, Path)
+
+		evaluator = make_evaluator(resource_path, backend = backend)
 
 		self.assertIsInstance(evaluator, Evaluator)
 
@@ -38,9 +45,7 @@ class EvaluatorBuilderTest(TestCase):
 
 		self.assertIsInstance(resource_bytes, bytes)
 
-		evaluator = LoadingModelEvaluatorBuilder(backend) \
-			.loadBytes(resource_bytes) \
-			.build()
+		evaluator = make_evaluator(resource_bytes, backend = backend)
 
 		self.assertIsInstance(evaluator, Evaluator)
 
@@ -49,9 +54,7 @@ class EvaluatorBuilderTest(TestCase):
 
 		self.assertIsInstance(resource_string, str)
 
-		evaluator = LoadingModelEvaluatorBuilder(backend) \
-			.loadString(resource_string) \
-			.build()
+		evaluator = make_evaluator(resource_string, backend = backend)
 
 		self.assertIsInstance(evaluator, Evaluator)
 

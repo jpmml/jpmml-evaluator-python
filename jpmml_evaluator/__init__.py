@@ -1,8 +1,10 @@
+import os
 import pickle
 
 from abc import abstractmethod, abstractclassmethod, ABC
 from importlib.resources import files
 from pandas import DataFrame
+from pathlib import Path
 
 import numpy
 
@@ -228,6 +230,8 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 		return self
 
 	def loadFile(self, path):
+		if isinstance(path, Path):
+			path = str(path)
 		javaFile = self.backend.newObject("java.io.File", path)
 		self.javaModelEvaluatorBuilder.load(javaFile)
 		return self
@@ -270,13 +274,14 @@ def make_backend(alias):
 		aliases = ["jpype", "pyjnius", "py4j"]
 		raise ValueError("Java backend alias {0} not in {1}".format(alias, aliases))
 
-def make_evaluator(path, backend = "jpype", lax = False, locatable = False, reporting = False, transpile = False):
+def make_evaluator(obj, backend = "jpype", lax = False, locatable = False, reporting = False, transpile = False):
 	""" Builds an Evaluator based on a PMML file.
 
 	Parameters:
 	----------
-	path: string
-		The path to the PMML file in local filesystem.
+	obj: string or bytes
+		The object to load. Either a path to a PMML file in local filesystem,
+		or a PMML string or byte array.
 
 	backend: JavaBackend or string
 		The Java backend or its alias
@@ -303,12 +308,26 @@ def make_evaluator(path, backend = "jpype", lax = False, locatable = False, repo
 		raise TypeError()
 
 	evaluatorBuilder = LoadingModelEvaluatorBuilder(backend, lax) \
-		.setLocatable(locatable) \
-		.loadFile(path)
+		.setLocatable(locatable)
+
+	if isinstance(obj, Path):
+		evaluatorBuilder = evaluatorBuilder.loadFile(obj)
+	elif isinstance(obj, str):
+		if len(obj) < 1024 and os.path.isfile(obj):
+			evaluatorBuilder = evaluatorBuilder.loadFile(obj)
+		else:
+			evaluatorBuilder = evaluatorBuilder.loadString(obj)
+	elif isinstance(obj, bytes):
+		evaluatorBuilder = evaluatorBuilder.loadBytes(obj)
+	else:
+		raise TypeError()
+
 	if reporting:
-		evaluatorBuilder.setReportingValueFactoryFactory()
+		evaluatorBuilder = evaluatorBuilder.setReportingValueFactoryFactory()
+
 	if transpile:
-		evaluatorBuilder.transpile(transpile if isinstance(transpile, str) else None)
+		evaluatorBuilder = evaluatorBuilder.transpile(transpile if isinstance(transpile, str) else None)
+
 	return evaluatorBuilder.build()
 
 def _package_data_jars(package_data_dir):
