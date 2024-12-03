@@ -1,8 +1,10 @@
+from unittest import TestCase
+
 from jpmml_evaluator.py4j import Py4JBackend
 
-from . import EvaluatorTest
+from . import EvaluatorTest, EvaluatorBuilderTest
 
-class Py4JEvaluatorTest(EvaluatorTest):
+class Py4JEvaluatorTest(TestCase):
 
 	def setUp(self):
 		Py4JBackend.createGateway()
@@ -10,5 +12,8 @@ class Py4JEvaluatorTest(EvaluatorTest):
 	def tearDown(self):
 		Py4JBackend.destroyGateway()
 
-	def test_py4j(self):
-		super(Py4JEvaluatorTest, self).workflow("py4j", lax = False)
+	def test_evaluatorBuilder(self):
+		EvaluatorBuilderTest().workflow("py4j")
+
+	def test_evaluator(self):
+		EvaluatorTest().workflow("py4j", lax = False)

@@ -1,8 +1,10 @@
+from unittest import TestCase
+
 from jpmml_evaluator.jpype import JPypeBackend
 
-from . import EvaluatorTest
+from . import EvaluatorTest, EvaluatorBuilderTest
 
-class JPypeEvaluatorTest(EvaluatorTest):
+class JPypeEvaluatorTest(TestCase):
 
 	def setUp(self):
 		JPypeBackend.createJVM()
@@ -10,5 +12,8 @@ class JPypeEvaluatorTest(EvaluatorTest):
 	def tearDown(self):
 		JPypeBackend.destroyJVM()
 
-	def test_jpype(self):
-		super(JPypeEvaluatorTest, self).workflow("jpype", lax = False)
+	def test_evaluatorBuilder(self):
+		EvaluatorBuilderTest().workflow("jpype")
+
+	def test_evaluator(self):
+		EvaluatorTest().workflow("jpype", lax = False)

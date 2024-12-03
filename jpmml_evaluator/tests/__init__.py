@@ -5,7 +5,7 @@ from unittest import TestCase
 import numpy
 import pandas
 
-from jpmml_evaluator import make_backend, make_evaluator, JavaError
+from jpmml_evaluator import make_backend, make_evaluator, Evaluator, JavaError, LoadingModelEvaluatorBuilder
 
 def _resource(name):
 	return os.path.join(os.path.dirname(__file__), "resources", name)
@@ -15,6 +15,30 @@ def _argumentsToResults(backend, arguments):
 	results = backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "argumentsToResults", arguments)
 	results = backend.loads(results)
 	return results
+
+class EvaluatorBuilderTest(TestCase):
+
+	def workflow(self, backend):
+
+		if isinstance(backend, str):
+			backend = make_backend(backend)
+
+		resource = _resource("DecisionTreeIris.pmml")
+
+		evaluator = LoadingModelEvaluatorBuilder(backend) \
+			.loadFile(resource) \
+			.build()
+
+		self.assertIsInstance(evaluator, Evaluator)
+
+		with open(resource, "rb") as file:
+			resource_bytes = bytes(file.read())
+
+		evaluator = LoadingModelEvaluatorBuilder(backend) \
+			.loadBytes(resource_bytes) \
+			.build()
+
+		self.assertIsInstance(evaluator, Evaluator)
 
 class EvaluatorTest(TestCase):
 

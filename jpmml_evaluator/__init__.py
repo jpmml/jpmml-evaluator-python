@@ -232,6 +232,11 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 		self.javaModelEvaluatorBuilder.load(file)
 		return self
 
+	def loadBytes(self, bytes):
+		stream = self.backend.newObject("java.io.ByteArrayInputStream", bytes)
+		self.javaModelEvaluatorBuilder.load(stream)
+		return self
+
 	def transform(self, javaPMMLTransformer):
 		self.javaModelEvaluatorBuilder.transform(javaPMMLTransformer)
 		return self

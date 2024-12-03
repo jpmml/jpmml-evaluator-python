@@ -1,8 +1,10 @@
+from unittest import TestCase
+
 from jpmml_evaluator.pyjnius import PyJNIusBackend
 
-from . import EvaluatorTest
+from . import EvaluatorTest, EvaluatorBuilderTest
 
-class PyJNIusEvaluatorTest(EvaluatorTest):
+class PyJNIusEvaluatorTest(TestCase):
 
 	def setUp(self):
 		PyJNIusBackend.createJVM()
@@ -10,5 +12,8 @@ class PyJNIusEvaluatorTest(EvaluatorTest):
 	def tearDown(self):
 		PyJNIusBackend.destroyJVM()
 
-	def test_pyjnius(self):
-		super(PyJNIusEvaluatorTest, self).workflow("pyjnius", lax = True)
+	def test_evaluatorBuilder(self):
+		EvaluatorBuilderTest().workflow("pyjnius")
+
+	def test_evaluator(self):
+		EvaluatorTest().workflow("pyjnius", lax = True)
