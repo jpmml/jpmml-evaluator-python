@@ -25,6 +25,8 @@ class EvaluatorBuilderTest(TestCase):
 
 		resource = _resource("DecisionTreeIris.pmml")
 
+		self.assertIsInstance(resource, str)
+
 		evaluator = LoadingModelEvaluatorBuilder(backend) \
 			.loadFile(resource) \
 			.build()
@@ -34,8 +36,21 @@ class EvaluatorBuilderTest(TestCase):
 		with open(resource, "rb") as file:
 			resource_bytes = bytes(file.read())
 
+		self.assertIsInstance(resource_bytes, bytes)
+
 		evaluator = LoadingModelEvaluatorBuilder(backend) \
 			.loadBytes(resource_bytes) \
+			.build()
+
+		self.assertIsInstance(evaluator, Evaluator)
+
+		with open(resource, "r") as file:
+			resource_string = file.read()
+
+		self.assertIsInstance(resource_string, str)
+
+		evaluator = LoadingModelEvaluatorBuilder(backend) \
+			.loadString(resource_string) \
 			.build()
 
 		self.assertIsInstance(evaluator, Evaluator)

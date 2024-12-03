@@ -232,6 +232,9 @@ class LoadingModelEvaluatorBuilder(BaseModelEvaluatorBuilder):
 		self.javaModelEvaluatorBuilder.load(file)
 		return self
 
+	def loadString(self, string):
+		return self.loadBytes(bytes(string, "utf-8"))
+
 	def loadBytes(self, bytes):
 		stream = self.backend.newObject("java.io.ByteArrayInputStream", bytes)
 		self.javaModelEvaluatorBuilder.load(stream)
