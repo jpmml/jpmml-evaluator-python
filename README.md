@@ -31,7 +31,7 @@ pip install --upgrade git+https://github.com/jpmml/jpmml-evaluator-python.git
 ## Command-line application ##
 
 The `jpmml_evaluator` module is executable.
-The main application loads loads the model from the PMML file, and scores all data records from the input CSV file or stream; scoring results are written to the output CSV file or stream:
+The main application loads the model from the PMML file, and scores all data records from the input CSV file or stream; scoring results are written to the output CSV file or stream:
 
 ```
 python -m jpmml_evaluator DecisionTreeIris.pmml --input Iris.csv --output DecisionTreeIris.csv
@@ -49,7 +49,7 @@ Getting help:
 python -m jpmml_evaluator --help
 ```
 
-One some platforms, the [Pip](https://pypi.org/project/pip/) package installer additionally makes the main application available as a top-level command:
+On some platforms, the [Pip](https://pypi.org/project/pip/) package installer additionally makes the main application available as a top-level command:
 
 ```
 jpmml_evaluator DecisionTreeIris.pmml < Iris.csv > DecisionTreeIris.csv
