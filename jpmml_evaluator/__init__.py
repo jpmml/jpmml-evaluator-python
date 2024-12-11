@@ -164,9 +164,13 @@ class Evaluator(JavaObject):
 
 	def evaluateAll(self, arguments_df, nan_as_missing = True):
 		arguments_df = _canonicalizeAll(arguments_df, nan_as_missing = nan_as_missing)
+		columns = arguments_df.columns.tolist()
+		data = []
+		for column in columns:
+			data.append(arguments_df[column].tolist())
 		arguments_dict = {
-			"columns" : arguments_df.columns.tolist(),
-			"data" : arguments_df.values.tolist()
+			"columns" : columns,
+			"data" : data
 		}
 		arguments = self.backend.dumps(arguments_dict)
 		try:
@@ -174,7 +178,13 @@ class Evaluator(JavaObject):
 		except Exception as e:
 			raise self.backend.toJavaError(e)
 		results_dict = self.backend.loads(results)
-		results_df = DataFrame(data = results_dict["data"], index = (arguments_df.index.copy() if (len(arguments_dict["data"]) == len(results_dict["data"])) else None), columns = results_dict["columns"])
+		columns = results_dict["columns"]
+		data = results_dict["data"]
+		results_df = DataFrame()
+		for idx, column in enumerate(columns):
+			results_df[column] = data[idx]
+		if len(arguments_df) == len(results_df):
+			results_df.index = arguments_df.index.copy()
 		if hasattr(self, "dropColumns"):
 			for dropColumn in self.dropColumns:
 				results_df.drop(str(dropColumn), axis = 1, inplace = True)

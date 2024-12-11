@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import net.razorvine.pickle.Pickler;
 import net.razorvine.pickle.Unpickler;
@@ -36,6 +35,9 @@ import numpy.core.Scalar;
 import numpy.core.ScalarUtil;
 import org.jpmml.evaluator.Evaluator;
 import org.jpmml.evaluator.EvaluatorUtil;
+import org.jpmml.evaluator.Table;
+import org.jpmml.evaluator.TableReader;
+import org.jpmml.evaluator.TableWriter;
 import org.jpmml.python.PickleUtil;
 
 public class PythonUtil {
@@ -54,53 +56,41 @@ public class PythonUtil {
 
 	static
 	public Map<String, ?> evaluateAll(Evaluator evaluator, Map<String, ?> argumentsDict){
-		ColumnMapper argumentMapper = new ColumnMapper((List<String>)argumentsDict.get("columns"));
-		List<List<?>> argumentData = (List<List<?>>)argumentsDict.get("data");
+		Table argumentsTable = parseDict(argumentsDict);
 
-		ColumnMapper resultMapper = new ColumnMapper();
-		List<List<?>> resultData = new ArrayList<>();
+		TableReader argumentsReader = new TableReader(argumentsTable){
 
-		TabularArguments arguments = new TabularArguments(argumentMapper);
+			@Override
+			public Object get(Object key){
+				return super.get((String)key);
+			}
+		};
 
-		for(int i = 0; i < argumentData.size(); i++){
-			List<?> argumentRow = argumentData.get(i);
+		Table resultsTable = new Table();
 
-			arguments.setRow(argumentRow);
+		TableWriter resultsWriter = new TableWriter(resultsTable){
+
+			@Override
+			public Object put(String key, Object value){
+				value = EvaluatorUtil.decode(value);
+
+				return super.put(key, value);
+			}
+		};
+
+		while(argumentsReader.hasNext()){
+			Map<String, ?> arguments = argumentsReader.next();
+
+			resultsWriter.next();
 
 			Map<String, ?> results = evaluator.evaluate(arguments);
 
-			int numberOfColumns = resultMapper.size();
-
-			List<Object> resultRow = new ArrayList<>(numberOfColumns);
-			for(int j = 0; j < numberOfColumns; j++){
-				resultRow.add(null);
-			}
-
-			Collection<? extends Map.Entry<String, ?>> entries = results.entrySet();
-			for(Map.Entry<String, ?> entry : entries){
-				String name = entry.getKey();
-				Object value = EvaluatorUtil.decode(entry.getValue());
-
-				Integer index = resultMapper.putIfAbsent(name, numberOfColumns);
-				if(index == null){
-					resultRow.add(value);
-
-					numberOfColumns++;
-				} else
-
-				{
-					resultRow.set(index, value);
-				}
-			}
-
-			resultData.add(resultRow);
+			resultsWriter.putAll(results);
 		}
 
-		Map<String, Object> resultsDict = new HashMap<>();
-		resultsDict.put("columns", new ArrayList<>(resultMapper.getColumns()));
-		resultsDict.put("data", resultData);
+		resultsTable.canonicalize();
 
-		return resultsDict;
+		return formatDict(resultsTable);
 	}
 
 	static
@@ -188,6 +178,46 @@ public class PythonUtil {
 	}
 
 	static
+	private Table parseDict(Map<String, ?> dict){
+		List<String> columns = (List)dict.get("columns");
+		List<List<?>> data = (List)dict.get("data");
+
+		if(columns.size() != data.size()){
+			throw new IllegalArgumentException();
+		}
+
+		Table result = new Table(columns);
+
+		for(int i = 0; i < columns.size(); i++){
+			String column = columns.get(i);
+			List<?> values = data.get(i);
+
+			result.setValues(column, values);
+		}
+
+		return result;
+	}
+
+	static
+	public Map<String, ?> formatDict(Table table){
+		List<String> columns = table.getColumns();
+		List<List<?>> data = new ArrayList<>();
+
+		for(int i = 0; i < columns.size(); i++){
+			String column = columns.get(i);
+			List<?> values = table.getValues(column);
+
+			data.add(values);
+		}
+
+		Map<String, List<?>> result = new HashMap<>();
+		result.put("columns", columns);
+		result.put("data", data);
+
+		return result;
+	}
+
+	static
 	private Object unpickle(byte[] bytes) throws IOException {
 		Unpickler unpickler = new Unpickler();
 
@@ -199,76 +229,6 @@ public class PythonUtil {
 		Pickler pickler = new Pickler();
 
 		return pickler.dumps(object);
-	}
-
-	static
-	private class ColumnMapper extends HashMap<String, Integer> {
-
-		public ColumnMapper(){
-		}
-
-		public ColumnMapper(List<String> columns){
-
-			for(int i = 0; i < columns.size(); i++){
-				String column = columns.get(i);
-
-				putIfAbsent(column, size());
-			}
-		}
-
-		public List<String> getColumns(){
-			Collection<Map.Entry<String, Integer>> entries = entrySet();
-
-			return entries.stream()
-				.sorted((left, right) -> {
-					return (left.getValue()).compareTo(right.getValue());
-				})
-				.map(entry -> entry.getKey())
-				.collect(Collectors.toList());
-		}
-	}
-
-	static
-	private class TabularArguments extends AbstractMap<String, Object> {
-
-		private ColumnMapper mapper = null;
-
-		private List<?> row = null;
-
-
-		public TabularArguments(ColumnMapper mapper){
-			this.mapper = mapper;
-		}
-
-		@Override
-		public Object get(Object key){
-			Integer index = this.mapper.get(key);
-
-			if(index != null){
-				return getValue(index);
-			}
-
-			return null;
-		}
-
-		@Override
-		public Set<Entry<String, Object>> entrySet(){
-			throw new UnsupportedOperationException();
-		}
-
-		public Object getValue(int index){
-			List<?> row = getRow();
-
-			return row.get(index);
-		}
-
-		public List<?> getRow(){
-			return this.row;
-		}
-
-		public void setRow(List<?> row){
-			this.row = row;
-		}
 	}
 
 	static {
