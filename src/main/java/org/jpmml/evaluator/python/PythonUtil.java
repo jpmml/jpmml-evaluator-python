@@ -46,6 +46,37 @@ public class PythonUtil {
 	}
 
 	static
+	public byte[] evaluate(Evaluator evaluator, byte[] dictBytes) throws IOException {
+		Map<String, ?> arguments = (Map)unpickle(dictBytes);
+
+		Map<String, ?> results = evaluate(evaluator, arguments);
+
+		return pickle(results);
+	}
+
+	static
+	public Map<String, ?> evaluate(Evaluator evaluator, Map<String, ?> arguments){
+		Map<String, Object> pmmlArguments = new AbstractMap<String, Object>(){
+
+			@Override
+			public Object get(Object key){
+				Object value = arguments.get(key);
+
+				return toJavaPrimitive(value);
+			}
+
+			@Override
+			public Set<Entry<String, Object>> entrySet(){
+				throw new UnsupportedOperationException();
+			}
+		};
+
+		Map<String, ?> pmmlResults = evaluator.evaluate(pmmlArguments);
+
+		return EvaluatorUtil.decodeAll(pmmlResults);
+	}
+
+	static
 	public byte[] evaluateAll(Evaluator evaluator, byte[] dictBytes) throws IOException {
 		Map<String, ?> argumentsDict = (Map)unpickle(dictBytes);
 
@@ -91,37 +122,6 @@ public class PythonUtil {
 		resultsTable.canonicalize();
 
 		return formatDict(resultsTable);
-	}
-
-	static
-	public byte[] evaluate(Evaluator evaluator, byte[] dictBytes) throws IOException {
-		Map<String, ?> arguments = (Map)unpickle(dictBytes);
-
-		Map<String, ?> results = evaluate(evaluator, arguments);
-
-		return pickle(results);
-	}
-
-	static
-	public Map<String, ?> evaluate(Evaluator evaluator, Map<String, ?> arguments){
-		Map<String, Object> pmmlArguments = new AbstractMap<String, Object>(){
-
-			@Override
-			public Object get(Object key){
-				Object value = arguments.get(key);
-
-				return toJavaPrimitive(value);
-			}
-
-			@Override
-			public Set<Entry<String, Object>> entrySet(){
-				throw new UnsupportedOperationException();
-			}
-		};
-
-		Map<String, ?> pmmlResults = evaluator.evaluate(pmmlArguments);
-
-		return EvaluatorUtil.decodeAll(pmmlResults);
 	}
 
 	static
