@@ -21,8 +21,11 @@ package org.jpmml.evaluator.python;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,16 +49,16 @@ public class PythonUtil {
 	}
 
 	static
-	public byte[] evaluate(Evaluator evaluator, byte[] dictBytes) throws IOException {
+	public byte[] evaluate(Evaluator evaluator, byte[] dictBytes, String[] dropColumns) throws IOException {
 		Map<String, ?> arguments = (Map)unpickle(dictBytes);
 
-		Map<String, ?> results = evaluate(evaluator, arguments);
+		Map<String, ?> results = evaluate(evaluator, arguments, dropColumns != null ? toSet(dropColumns) : null);
 
 		return pickle(results);
 	}
 
 	static
-	public Map<String, ?> evaluate(Evaluator evaluator, Map<String, ?> arguments){
+	public Map<String, ?> evaluate(Evaluator evaluator, Map<String, ?> arguments, Set<String> dropColumns){
 		Map<String, Object> pmmlArguments = new AbstractMap<String, Object>(){
 
 			@Override
@@ -73,20 +76,26 @@ public class PythonUtil {
 
 		Map<String, ?> pmmlResults = evaluator.evaluate(pmmlArguments);
 
-		return EvaluatorUtil.decodeAll(pmmlResults);
+		Map<String, ?> results = EvaluatorUtil.decodeAll(pmmlResults);
+
+		if(dropColumns != null){
+			(results.keySet()).removeAll(dropColumns);
+		}
+
+		return results;
 	}
 
 	static
-	public byte[] evaluateAll(Evaluator evaluator, byte[] dictBytes) throws IOException {
+	public byte[] evaluateAll(Evaluator evaluator, byte[] dictBytes, String[] dropColumns) throws IOException {
 		Map<String, ?> argumentsDict = (Map)unpickle(dictBytes);
 
-		Map<String, ?> resultsDict = evaluateAll(evaluator, argumentsDict);
+		Map<String, ?> resultsDict = evaluateAll(evaluator, argumentsDict, dropColumns != null ? toSet(dropColumns) : null);
 
 		return pickle(resultsDict);
 	}
 
 	static
-	public Map<String, ?> evaluateAll(Evaluator evaluator, Map<String, ?> argumentsDict){
+	public Map<String, ?> evaluateAll(Evaluator evaluator, Map<String, ?> argumentsDict, Set<String> dropColumns){
 		Table argumentsTable = parseDict(argumentsDict);
 
 		TableReader argumentsReader = new TableReader(argumentsTable){
@@ -103,6 +112,11 @@ public class PythonUtil {
 
 			@Override
 			public Object put(String key, Object value){
+
+				if(dropColumns != null && dropColumns.contains(key)){
+					return null;
+				}
+
 				value = EvaluatorUtil.decode(value);
 
 				return super.put(key, value);
@@ -139,6 +153,22 @@ public class PythonUtil {
 		}
 
 		return pickle(results);
+	}
+
+	static
+	public <E> Set<E> toSet(E[] values){
+
+		if(values.length == 0){
+			return Collections.emptySet();
+		} else
+
+		if(values.length == 1){
+			return Collections.singleton(values[0]);
+		} else
+
+		{
+			return new HashSet<>(Arrays.asList(values));
+		}
 	}
 
 	static

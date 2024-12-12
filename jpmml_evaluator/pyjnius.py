@@ -37,6 +37,9 @@ class PyJNIusBackend(JNIBackend):
 		javaClass = self._ensureJavaClass(className)
 		return javaClass(*args)
 
+	def newArray(self, className, values):
+		return list(values)
+
 	def staticInvoke(self, className, methodName, *args):
 		if className == "java.lang.Class" and methodName == "forName":
 			from jnius import find_javaclass

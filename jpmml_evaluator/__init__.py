@@ -45,6 +45,10 @@ class JavaBackend(ABC):
 		raise NotImplementedError()
 
 	@abstractmethod
+	def newArray(self, className, values):
+		raise NotImplementedError()
+
+	@abstractmethod
 	def newObject(self, className, *args):
 		raise NotImplementedError()
 
@@ -152,14 +156,12 @@ class Evaluator(JavaObject):
 	def evaluate(self, arguments, nan_as_missing = True):
 		arguments = _canonicalize(arguments, nan_as_missing = nan_as_missing)
 		arguments = self.backend.dumps(arguments)
+		dropColumns = self.backend.newArray("java.lang.String", self.dropColumns) if hasattr(self, "dropColumns") else None
 		try:
-			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluate", self.javaEvaluator, arguments)
+			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluate", self.javaEvaluator, arguments, dropColumns)
 		except Exception as e:
 			raise self.backend.toJavaError(e)
 		results = self.backend.loads(results)
-		if hasattr(self, "dropColumns"):
-			for dropColumn in self.dropColumns:
-				del results[dropColumn]
 		return results
 
 	def evaluateAll(self, arguments_df, nan_as_missing = True):
@@ -173,8 +175,9 @@ class Evaluator(JavaObject):
 			"data" : data
 		}
 		arguments = self.backend.dumps(arguments_dict)
+		dropColumns = self.backend.newArray("java.lang.String", self.dropColumns) if hasattr(self, "dropColumns") else None
 		try:
-			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, arguments)
+			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, arguments, dropColumns)
 		except Exception as e:
 			raise self.backend.toJavaError(e)
 		results_dict = self.backend.loads(results)
@@ -185,9 +188,6 @@ class Evaluator(JavaObject):
 			results_df[column] = data[idx]
 		if len(arguments_df) == len(results_df):
 			results_df.index = arguments_df.index.copy()
-		if hasattr(self, "dropColumns"):
-			for dropColumn in self.dropColumns:
-				results_df.drop(str(dropColumn), axis = 1, inplace = True)
 		return results_df
 
 	def predict(self, X):

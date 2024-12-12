@@ -32,6 +32,9 @@ class JPypeBackend(JNIBackend):
 		javaClass = self._ensureJavaClass(className)
 		return javaClass(*args)
 
+	def newArray(self, className, values):
+		return list(values)
+
 	def staticInvoke(self, className, methodName, *args):
 		javaClass = self._ensureJavaClass(className)
 		javaMember = getattr(javaClass, methodName)

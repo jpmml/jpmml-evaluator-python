@@ -41,6 +41,13 @@ class Py4JBackend(JavaBackend):
 		javaClass = self._ensureJavaClass(className)
 		return javaClass(*args)
 
+	def newArray(self, className, values):
+		javaClass = self._ensureJavaClass(className)
+		javaArray = self.gateway.new_array(javaClass, len(values))
+		for idx, value in enumerate(values):
+			javaArray[idx] = value
+		return javaArray
+
 	def staticInvoke(self, className, methodName, *args):
 		javaClass = self._ensureJavaClass(className)
 		javaMember = getattr(javaClass, methodName)
