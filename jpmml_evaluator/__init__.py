@@ -2,7 +2,6 @@ import os
 import pickle
 
 from abc import abstractmethod, abstractclassmethod, ABC
-from importlib.resources import files
 from pandas import DataFrame
 from pathlib import Path
 
@@ -340,9 +339,12 @@ def make_evaluator(obj, backend = "jpype", lax = False, locatable = False, repor
 
 	return evaluatorBuilder.build()
 
-def _package_data_jars(package_data_dir):
+def _package_data_jars(data_dir):
+	package_dir = Path(__import__("jpmml_evaluator").__file__).parent
+	package_data_dir = package_dir / data_dir
+
 	jars = []
-	resources = files(package_data_dir).iterdir()
+	resources = package_data_dir.iterdir()
 	for resource in resources:
 		resource = resource.resolve()
 		if resource.suffix == ".jar":
@@ -353,4 +355,4 @@ def _classpath(user_classpath):
 	return _package_classpath() + user_classpath
 
 def _package_classpath():
-	return _package_data_jars("jpmml_evaluator.resources") + _package_data_jars("jpmml_evaluator.dependencies")
+	return _package_data_jars("resources") + _package_data_jars("dependencies")
