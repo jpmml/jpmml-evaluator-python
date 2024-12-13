@@ -10,7 +10,7 @@ This package provides Python wrapper classes and functions for the [JPMML-Evalua
 # Prerequisites #
 
 * Java Platform, Standard Edition 8 or newer.
-* Python 3.9 or newer.
+* Python 3.8 or newer.
 
 # Installation #
 

@@ -24,7 +24,7 @@ setup(
 			"jpmml_evaluator=jpmml_evaluator.cli:main",
 		],
 	},
-	python_requires = ">=3.9",
+	python_requires = ">=3.8",
 	install_requires = [
 		"jpype1",
 		"pandas",
