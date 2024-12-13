@@ -4,9 +4,11 @@ from argparse import ArgumentParser
 
 import pandas
 
-from jpmml_evaluator import make_evaluator
+from jpmml_evaluator import __version__, make_evaluator
 
 def main():
+	version = "JPMML-Evaluator-Python {}".format(__version__)
+
 	parser = ArgumentParser(prog = "jpmml_evaluator", description = "JPMML-Evaluator command-line application")
 	parser.add_argument("model", type = str, help = "Model PMML file")
 	parser.add_argument("--backend", type = str, default = "jpype", help = "Java backend. One of 'jpype', 'pyjnius' or 'py4j'")
@@ -14,6 +16,7 @@ def main():
 	parser.add_argument("-i", "--input", type = str, help = "Input CSV file. If absent, read from system input")
 	parser.add_argument("-o", "--output", type = str, help = "Output CSV file. If absent, write to system output")
 	parser.add_argument("--sep", type = str, default = ",", help = "CSV separator character")
+	parser.add_argument("--version", action = "version", version = version)
 
 	args = parser.parse_args()
 
