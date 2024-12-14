@@ -114,6 +114,8 @@ print("Output fields: " + str([outputField.getName() for outputField in outputFi
 Evaluating a single data record:
 
 ```python
+from jpmml_evaluator import JavaError
+
 arguments = {
 	"Sepal_Length" : 5.1,
 	"Sepal_Width" : 3.5,
@@ -121,8 +123,11 @@ arguments = {
 	"Petal_Width" : 0.2
 }
 
-results = evaluator.evaluate(arguments)
-print(results)
+try:
+	results = evaluator.evaluate(arguments)
+	print(results)
+except JavaError as je:
+	pass
 ```
 
 Evaluating a collection of data records:
@@ -132,8 +137,23 @@ import pandas
 
 arguments_df = pandas.read_csv("Iris.csv", sep = ",")
 
-results_df = evaluator.evaluateAll(arguments_df)
+results_df = evaluator.evaluateAll(arguments_df, error_col = "errors")
 print(results_df)
+
+# The error column is added to the results DataFrame only if there was something erroneous happening
+errors = df_results["errors"] if "errors" in results_df.columns else None
+if errors is not None:
+	pass
+```
+
+Alternatively, getting the results DataFrame and errors Series as separate objects:
+
+```python
+results_df, errors = evaluator.evaluateAll(arguments_df, error_col = None)
+print(results_df)
+
+if errors is not None:
+	pass
 ```
 
 # License #

@@ -2,7 +2,7 @@ import os
 import pickle
 
 from abc import abstractmethod, abstractclassmethod, ABC
-from pandas import DataFrame
+from pandas import DataFrame, Series
 from pathlib import Path
 
 import numpy
@@ -163,7 +163,7 @@ class Evaluator(JavaObject):
 		results = self.backend.loads(results)
 		return results
 
-	def evaluateAll(self, arguments_df, nan_as_missing = True):
+	def evaluateAll(self, arguments_df, nan_as_missing = True, error_col = "errors"):
 		arguments_df = _canonicalizeAll(arguments_df, nan_as_missing = nan_as_missing)
 		columns = arguments_df.columns.tolist()
 		data = []
@@ -182,12 +182,22 @@ class Evaluator(JavaObject):
 		results_dict = self.backend.loads(results)
 		columns = results_dict["columns"]
 		data = results_dict["data"]
+		errors = results_dict["errors"]
 		results_df = DataFrame()
 		for idx, column in enumerate(columns):
 			results_df[column] = data[idx]
 		if len(arguments_df) == len(results_df):
 			results_df.index = arguments_df.index.copy()
-		return results_df
+		if errors is not None:
+			errors = Series(errors, name = error_col, dtype = str)
+			if len(arguments_df) == len(errors):
+				errors.index = arguments_df.index.copy()
+		if error_col:
+			if errors is not None:
+				results_df[error_col] = errors
+			return results_df
+		else:
+			return (results_df, errors)
 
 	def predict(self, X):
 		return self.evaluateAll(X)

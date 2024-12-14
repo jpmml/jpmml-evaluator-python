@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.razorvine.pickle.Pickler;
 import net.razorvine.pickle.Unpickler;
@@ -128,9 +129,13 @@ public class PythonUtil {
 
 			resultsWriter.next();
 
-			Map<String, ?> results = evaluator.evaluate(arguments);
+			try {
+				Map<String, ?> results = evaluator.evaluate(arguments);
 
-			resultsWriter.putAll(results);
+				resultsWriter.putAll(results);
+			} catch(Exception e){
+				resultsWriter.put(e);
+			}
 		}
 
 		resultsTable.canonicalize();
@@ -240,11 +245,35 @@ public class PythonUtil {
 			data.add(values);
 		}
 
+		List<Exception> exceptions = table.getExceptions();
+		List<String> errors = null;
+
+		if(containsNonNull(exceptions)){
+			errors = exceptions.stream()
+				.map(exception -> (exception != null ? exception.toString() : null))
+				.collect(Collectors.toList());
+		}
+
 		Map<String, List<?>> result = new HashMap<>();
 		result.put("columns", columns);
 		result.put("data", data);
+		result.put("errors", errors);
 
 		return result;
+	}
+
+	static
+	private <E> boolean containsNonNull(List<E> values){
+
+		for(int i = 0; i < values.size(); i++){
+			E value = values.get(i);
+
+			if(value != null){
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	static

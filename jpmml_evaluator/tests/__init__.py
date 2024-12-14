@@ -160,7 +160,7 @@ class EvaluatorTest(TestCase):
 		print(arguments_df.head(5))
 
 		results_df = evaluator.evaluateAll(arguments_df)
-		print(results_df.head(5))
+		#print(results_df.head(5))
 
 		self.assertEqual((150, 5), results_df.shape)
 		self.assertEqual(arguments_df.index.tolist(), results_df.index.tolist())
@@ -170,7 +170,7 @@ class EvaluatorTest(TestCase):
 
 		evaluator.suppressResultFields([reportOutputField])
 
-		results_df = evaluator.evaluateAll(arguments_df)
+		results_df, errors = evaluator.evaluateAll(arguments_df, error_col = None)
 
 		self.assertEqual((150, 4), results_df.shape)
 		self.assertEqual(arguments_df.index.tolist(), results_df.index.tolist())
@@ -186,5 +186,31 @@ class EvaluatorTest(TestCase):
 
 		probabilityOutputFieldNames = [probabilityOutputField.getName() for probabilityOutputField in probabilityOutputFields]
 		self.assertTrue(numpy.allclose(expected_results_df[probabilityOutputFieldNames], results_df[probabilityOutputFieldNames], rtol = 1e-13, atol = 1e-13))
+
+		self.assertIsNone(errors)
+
+		arguments_df.iloc[13, :] = "error"
+
+		results_df = evaluator.evaluateAll(arguments_df)
+
+		self.assertEqual((150, 5), results_df.shape)
+		self.assertEqual(arguments_df.index.tolist(), results_df.index.tolist())
+
+		self.assertEqual(1, results_df["errors"].count())
+		self.assertEqual(None, results_df["Species"][13])
+		self.assertEqual("org.jpmml.evaluator.ValueCheckException: Field \"Petal.Length\" cannot accept invalid value \"error\"", results_df["errors"][13])
+
+		results_df, errors = evaluator.evaluateAll(arguments_df, error_col = None)
+
+		self.assertEqual((150, 4), results_df.shape)
+		self.assertEqual(arguments_df.index.tolist(), results_df.index.tolist())
+
+		self.assertEqual(None, results_df["Species"][13])
+
+		self.assertEqual((150,), errors.shape)
+		self.assertEqual(arguments_df.index.tolist(), errors.index.tolist())
+
+		self.assertEqual(1, errors.count())
+		self.assertEqual("org.jpmml.evaluator.ValueCheckException: Field \"Petal.Length\" cannot accept invalid value \"error\"", errors[13])
 
 		evaluator.suppressResultFields(None)
