@@ -20,7 +20,7 @@ jobs:
       - run: |
           python -m build
       - run: |
-          twine publish dist/*
+          twine upload dist/*
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
