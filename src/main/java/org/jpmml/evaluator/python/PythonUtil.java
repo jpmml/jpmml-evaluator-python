@@ -30,6 +30,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import net.razorvine.pickle.Pickler;
@@ -40,6 +43,7 @@ import numpy.core.ScalarUtil;
 import org.jpmml.evaluator.Evaluator;
 import org.jpmml.evaluator.EvaluatorUtil;
 import org.jpmml.evaluator.Table;
+import org.jpmml.evaluator.Table.Row;
 import org.jpmml.evaluator.TableCollector;
 import org.jpmml.python.PickleUtil;
 
@@ -86,19 +90,34 @@ public class PythonUtil {
 	}
 
 	static
-	public byte[] evaluateAll(Evaluator evaluator, byte[] dictBytes, String[] dropColumns) throws IOException {
+	public byte[] evaluateAll(Evaluator evaluator, byte[] dictBytes, String[] dropColumns, int parallelism) throws IOException {
 		Map<String, ?> argumentsDict = (Map)unpickle(dictBytes);
 
-		Map<String, ?> resultsDict = evaluateAll(evaluator, argumentsDict, dropColumns != null ? toSet(dropColumns) : null);
+		Map<String, ?> resultsDict = evaluateAll(evaluator, argumentsDict, (dropColumns != null ? toSet(dropColumns) : null), parallelism);
 
 		return pickle(resultsDict);
 	}
 
 	static
-	public Map<String, ?> evaluateAll(Evaluator evaluator, Map<String, ?> argumentsDict, Set<String> dropColumns){
+	public Map<String, ?> evaluateAll(Evaluator evaluator, Map<String, ?> argumentsDict, Set<String> dropColumns, int parallelism){
 		Table argumentsTable = parseDict(argumentsDict);
 
-		TableCollector resultsCollector = new TableCollector(){
+		Function<Row, Object> function = new Function<Row, Object>(){
+
+			@Override
+			public Object apply(Table.Row arguments){
+
+				try {
+					Map<String, ?> results = evaluator.evaluate(arguments);
+
+					return results;
+				} catch(Exception e){
+					return e;
+				}
+			}
+		};
+
+		TableCollector tableCollector = new TableCollector(){
 
 			@Override
 			protected Table.Row createFinisherRow(Table table){
@@ -121,18 +140,33 @@ public class PythonUtil {
 			}
 		};
 
-		Table resultsTable = argumentsTable.parallelStream()
-			.map(arguments -> {
+		Table resultsTable;
 
-				try {
-					Map<String, ?> results = evaluator.evaluate(arguments);
+		if(parallelism == -1){
+			resultsTable = argumentsTable.parallelStream()
+				.map(function)
+				.collect(tableCollector);
+		} else
 
-					return results;
-				} catch(Exception e){
-					return e;
-				}
-			})
-			.collect(resultsCollector);
+		if(parallelism == 1){
+			resultsTable = argumentsTable.stream()
+				.map(function)
+				.collect(tableCollector);
+		} else
+
+		{
+			ForkJoinPool forkJoinPool = new ForkJoinPool(parallelism);
+
+			ForkJoinTask<Table> forkJoinTask = ForkJoinTask.adapt(() -> {
+				return argumentsTable.parallelStream()
+					.map(function)
+					.collect(tableCollector);
+			});
+
+			resultsTable = forkJoinPool.invoke(forkJoinTask);
+
+			forkJoinPool.shutdown();
+		}
 
 		return formatDict(resultsTable);
 	}

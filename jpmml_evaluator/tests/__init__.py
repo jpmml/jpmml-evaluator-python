@@ -159,7 +159,7 @@ class EvaluatorTest(TestCase):
 		arguments_df = pandas.read_csv(_resource("Iris.csv"), sep = ",")
 		print(arguments_df.head(5))
 
-		results_df = evaluator.evaluateAll(arguments_df)
+		results_df = evaluator.evaluateAll(arguments_df, parallelism = 1)
 		#print(results_df.head(5))
 
 		self.assertEqual((150, 5), results_df.shape)
@@ -170,7 +170,7 @@ class EvaluatorTest(TestCase):
 
 		evaluator.suppressResultFields([reportOutputField])
 
-		results_df, errors = evaluator.evaluateAll(arguments_df, error_col = None)
+		results_df, errors = evaluator.evaluateAll(arguments_df, error_col = None, parallelism = 3)
 
 		self.assertEqual((150, 4), results_df.shape)
 		self.assertEqual(arguments_df.index.tolist(), results_df.index.tolist())

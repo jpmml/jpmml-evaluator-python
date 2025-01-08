@@ -163,7 +163,7 @@ class Evaluator(JavaObject):
 		results = self.backend.loads(results)
 		return results
 
-	def evaluateAll(self, arguments_df, nan_as_missing = True, error_col = "errors"):
+	def evaluateAll(self, arguments_df, nan_as_missing = True, error_col = "errors", parallelism = -1):
 		arguments_df = _canonicalizeAll(arguments_df, nan_as_missing = nan_as_missing)
 		columns = arguments_df.columns.tolist()
 		data = []
@@ -176,7 +176,7 @@ class Evaluator(JavaObject):
 		arguments = self.backend.dumps(arguments_dict)
 		dropColumns = self.backend.newArray("java.lang.String", self.dropColumns) if hasattr(self, "dropColumns") else None
 		try:
-			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, arguments, dropColumns)
+			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, arguments, dropColumns, parallelism)
 		except Exception as e:
 			raise self.backend.toJavaError(e)
 		results_dict = self.backend.loads(results)
