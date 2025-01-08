@@ -121,7 +121,7 @@ public class PythonUtil {
 			}
 		};
 
-		Table resultsTable = argumentsTable.stream()
+		Table resultsTable = argumentsTable.parallelStream()
 			.map(arguments -> {
 
 				try {
