@@ -1,6 +1,6 @@
-jpype1==1.5.1
+jpype1==1.5.2
 numpy==1.24.4; python_version == '3.8'
 numpy==1.26.4; python_version >= '3.9'
 pandas
-py4j==0.10.9.7
+py4j==0.10.9.9
 pyjnius==1.6.1
