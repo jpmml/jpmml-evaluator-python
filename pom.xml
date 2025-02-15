@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jpmml</groupId>
 		<artifactId>jpmml-evaluator</artifactId>
-		<version>1.6.11</version>
+		<version>1.7.1</version>
 	</parent>
 
 	<groupId>org.jpmml</groupId>
@@ -51,6 +51,10 @@
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-evaluator-metro</artifactId>
 			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.angus</groupId>
+					<artifactId>angus-activation</artifactId>
+				</exclusion>
 				<exclusion>
 					<groupId>org.glassfish.jaxb</groupId>
 					<artifactId>txw2</artifactId>

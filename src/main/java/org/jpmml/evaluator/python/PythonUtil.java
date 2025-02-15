@@ -32,8 +32,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.razorvine.pickle.Pickler;
 import net.razorvine.pickle.Unpickler;
@@ -41,9 +41,11 @@ import net.razorvine.pickle.objects.ClassDict;
 import numpy.core.Scalar;
 import numpy.core.ScalarUtil;
 import org.jpmml.evaluator.Evaluator;
+import org.jpmml.evaluator.EvaluatorFunction;
 import org.jpmml.evaluator.EvaluatorUtil;
+import org.jpmml.evaluator.ResultField;
+import org.jpmml.evaluator.ResultTableCollector;
 import org.jpmml.evaluator.Table;
-import org.jpmml.evaluator.Table.Row;
 import org.jpmml.evaluator.TableCollector;
 import org.jpmml.python.PickleUtil;
 
@@ -102,43 +104,24 @@ public class PythonUtil {
 	public Map<String, ?> evaluateAll(Evaluator evaluator, Map<String, ?> argumentsDict, Set<String> dropColumns, int parallelism){
 		Table argumentsTable = parseDict(argumentsDict);
 
-		Function<Row, Object> function = new Function<Row, Object>(){
+		EvaluatorFunction function = new EvaluatorFunction(evaluator);
 
-			@Override
-			public Object apply(Table.Row arguments){
+		List<ResultField> resultFields = Stream.concat(
+				(evaluator.getTargetFields()).stream(),
+				(evaluator.getOutputFields()).stream()
+			)
+			.filter(resultField -> {
+				String name = resultField.getName();
 
-				try {
-					Map<String, ?> results = evaluator.evaluate(arguments);
-
-					return results;
-				} catch(Exception e){
-					return e;
+				if(dropColumns != null && dropColumns.contains(name)){
+					return false;
 				}
-			}
-		};
 
-		TableCollector tableCollector = new TableCollector(){
+				return true;
+			})
+			.collect(Collectors.toList());
 
-			@Override
-			protected Table.Row createFinisherRow(Table table){
-				Table.Row result = table.new Row(0){
-
-					@Override
-					public Object put(String key, Object value){
-
-						if(dropColumns != null && dropColumns.contains(key)){
-							return null;
-						}
-
-						value = EvaluatorUtil.decode(value);
-
-						return super.put(key, value);
-					}
-				};
-
-				return result;
-			}
-		};
+		TableCollector tableCollector = new ResultTableCollector(resultFields, true);
 
 		Table resultsTable;
 

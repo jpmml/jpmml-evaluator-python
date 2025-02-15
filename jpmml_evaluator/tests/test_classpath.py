@@ -6,4 +6,4 @@ class ClasspathTest(TestCase):
 
 	def test_classpath(self):
 		classpath = _classpath([])
-		self.assertEqual(1 + 23, len(classpath))
+		self.assertEqual(1 + 24, len(classpath))
