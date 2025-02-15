@@ -39,6 +39,7 @@
 	</issueManagement>
 
 	<properties>
+		<jpmml-transpiler.version>1.4.0</jpmml-transpiler.version>
 		<project.build.outputTimestamp>2025-01-12T07:45:00Z</project.build.outputTimestamp>
 	</properties>
 
@@ -69,7 +70,7 @@
 		<dependency>
 			<groupId>org.jpmml</groupId>
 			<artifactId>pmml-transpiler</artifactId>
-			<version>1.3.10</version>
+			<version>${jpmml-transpiler.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jpmml</groupId>
