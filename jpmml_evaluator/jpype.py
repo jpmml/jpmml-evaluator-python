@@ -15,7 +15,7 @@ class JPypeBackend(JNIBackend):
 	def ensureJVM(cls):
 		if not jpype.isJVMStarted():
 			cls.createJVM()
-		importlib.import_module("org.jpmml.evaluator.python.PythonUtil")
+		importlib.import_module("org.jpmml.evaluator.python.PythonEvaluatorUtil")
 
 	@classmethod
 	def createJVM(cls, user_classpath = []):

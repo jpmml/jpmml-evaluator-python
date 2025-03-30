@@ -13,7 +13,7 @@ def _resource(name):
 
 def _argumentsToResults(backend, arguments):
 	arguments = backend.dumps(arguments)
-	results = backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "argumentsToResults", arguments)
+	results = backend.staticInvoke("org.jpmml.evaluator.python.PythonEvaluatorUtil", "argumentsToResults", arguments)
 	results = backend.loads(results)
 	return results
 

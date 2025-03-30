@@ -157,7 +157,7 @@ class Evaluator(JavaObject):
 		arguments = self.backend.dumps(arguments)
 		dropColumns = self.backend.newArray("java.lang.String", self.dropColumns) if hasattr(self, "dropColumns") else None
 		try:
-			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluate", self.javaEvaluator, arguments, dropColumns)
+			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonEvaluatorUtil", "evaluate", self.javaEvaluator, arguments, dropColumns)
 		except Exception as e:
 			raise self.backend.toJavaError(e)
 		results = self.backend.loads(results)
@@ -176,7 +176,7 @@ class Evaluator(JavaObject):
 		arguments = self.backend.dumps(arguments_dict)
 		dropColumns = self.backend.newArray("java.lang.String", self.dropColumns) if hasattr(self, "dropColumns") else None
 		try:
-			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonUtil", "evaluateAll", self.javaEvaluator, arguments, dropColumns, parallelism)
+			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonEvaluatorUtil", "evaluateAll", self.javaEvaluator, arguments, dropColumns, parallelism)
 		except Exception as e:
 			raise self.backend.toJavaError(e)
 		results_dict = self.backend.loads(results)

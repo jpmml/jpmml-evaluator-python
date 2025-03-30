@@ -49,9 +49,9 @@ import org.jpmml.evaluator.Table;
 import org.jpmml.evaluator.TableCollector;
 import org.jpmml.python.PickleUtil;
 
-public class PythonUtil {
+public class PythonEvaluatorUtil {
 
-	private PythonUtil(){
+	private PythonEvaluatorUtil(){
 	}
 
 	static
@@ -172,22 +172,6 @@ public class PythonUtil {
 	}
 
 	static
-	public <E> Set<E> toSet(E[] values){
-
-		if(values.length == 0){
-			return Collections.emptySet();
-		} else
-
-		if(values.length == 1){
-			return Collections.singleton(values[0]);
-		} else
-
-		{
-			return new HashSet<>(Arrays.asList(values));
-		}
-	}
-
-	static
 	public Object toJavaPrimitive(Object value){
 
 		if(value == null){
@@ -220,6 +204,22 @@ public class PythonUtil {
 
 		{
 			throw new IllegalArgumentException("Java type " + (value.getClass()).getName() + " is not supported");
+		}
+	}
+
+	static
+	private <E> Set<E> toSet(E[] values){
+
+		if(values.length == 0){
+			return Collections.emptySet();
+		} else
+
+		if(values.length == 1){
+			return Collections.singleton(values[0]);
+		} else
+
+		{
+			return new HashSet<>(Arrays.asList(values));
 		}
 	}
 
@@ -289,7 +289,7 @@ public class PythonUtil {
 	}
 
 	static {
-		ClassLoader clazzLoader = PythonUtil.class.getClassLoader();
+		ClassLoader clazzLoader = PythonEvaluatorUtil.class.getClassLoader();
 
 		PickleUtil.init(clazzLoader, "python2pmml.properties");
 	}

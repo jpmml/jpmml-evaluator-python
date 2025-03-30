@@ -22,7 +22,7 @@ class Py4JBackend(JavaBackend):
 	def ensureGateway(cls):
 		if not cls.gateway:
 			cls.createGateway()
-		getattr(cls.gateway.jvm, "org.jpmml.evaluator.python.PythonUtil")
+		getattr(cls.gateway.jvm, "org.jpmml.evaluator.python.PythonEvaluatorUtil")
 		return cls.gateway
 
 	@classmethod
