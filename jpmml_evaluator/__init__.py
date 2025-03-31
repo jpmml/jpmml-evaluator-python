@@ -48,16 +48,6 @@ class PythonEvaluatorUtil:
 		results_dict = backend.loads(results_dict)
 		return results_dict
 
-	@staticmethod
-	def argumentsToResults(backend, arguments):
-		arguments = backend.dumps(arguments)
-		try:
-			results = backend.staticInvoke(PythonEvaluatorUtil.JAVA_CLASS_NAME, "argumentsToResults", arguments)
-		except Exception as e:
-			raise backend.toJavaError(e)
-		results = backend.loads(results)
-		return results
-
 class JavaBackend(ABC):
 
 	def __init__(self):

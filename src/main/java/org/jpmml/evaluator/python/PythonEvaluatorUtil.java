@@ -22,11 +22,9 @@ import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +33,7 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Maps;
 import net.razorvine.pickle.Pickler;
 import net.razorvine.pickle.Unpickler;
 import net.razorvine.pickle.objects.ClassDict;
@@ -76,11 +75,21 @@ public class PythonEvaluatorUtil {
 
 			@Override
 			public Set<Entry<String, Object>> entrySet(){
-				throw new UnsupportedOperationException();
+				Maps.EntryTransformer<String, Object, Object> entryTransformer = new Maps.EntryTransformer<String, Object, Object>(){
+
+					@Override
+					public Object transformEntry(String key, Object value){
+						return toJavaPrimitive(value);
+					}
+				};
+
+				Map<String, Object> javaArguments = Maps.transformEntries(arguments, entryTransformer);
+
+				return javaArguments.entrySet();
 			}
 		};
 
-		Map<String, ?> pmmlResults = evaluator.evaluate(pmmlArguments);
+		Map<String, ?> pmmlResults = (evaluator != null ? evaluator.evaluate(pmmlArguments) : pmmlArguments);
 
 		Map<String, ?> results = EvaluatorUtil.decodeAll(pmmlResults);
 
@@ -152,23 +161,6 @@ public class PythonEvaluatorUtil {
 		}
 
 		return formatDict(resultsTable);
-	}
-
-	static
-	public byte[] argumentsToResults(byte[] dictBytes) throws IOException {
-		Map<String, ?> arguments = (Map)unpickle(dictBytes);
-
-		Map<String, Object> results = new LinkedHashMap<>();
-
-		Collection<? extends Map.Entry<String, ?>> entries = arguments.entrySet();
-		for(Map.Entry<String, ?> entry : entries){
-			String key = entry.getKey();
-			Object value = entry.getValue();
-
-			results.put(key, toJavaPrimitive(value));
-		}
-
-		return pickle(results);
 	}
 
 	static

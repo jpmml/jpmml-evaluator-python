@@ -66,7 +66,7 @@ class EvaluatorTest(TestCase):
 			"float" : float(1.0),
 			"bool" : bool(True)
 		}
-		pyResults = PythonEvaluatorUtil.argumentsToResults(backend, pyArguments)
+		pyResults = PythonEvaluatorUtil.evaluate(backend, None, pyArguments, None)
 
 		self.assertDictEqual(pyArguments, pyResults)
 
@@ -77,7 +77,7 @@ class EvaluatorTest(TestCase):
 			"float32" : numpy.float32(1.0),
 			"float64" : numpy.float64(1.0)
 		}
-		numpyResults = PythonEvaluatorUtil.argumentsToResults(backend, numpyArguments)
+		numpyResults = PythonEvaluatorUtil.evaluate(backend, None, numpyArguments, None)
 
 		self.assertDictEqual({"int8" : 1, "int16" : 1, "int32" : 1, "float32" : float(1.0), "float64" : float(1.0)}, numpyResults)
 
