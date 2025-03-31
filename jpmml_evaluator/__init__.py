@@ -20,6 +20,44 @@ def _canonicalizeAll(arguments_df, nan_as_missing):
 		arguments_df = arguments_df.replace({numpy.nan: None})
 	return arguments_df
 
+class PythonEvaluatorUtil:
+	JAVA_CLASS_NAME = "org.jpmml.evaluator.python.PythonEvaluatorUtil"
+
+	def __init__(self):
+		raise RuntimeError()
+
+	@staticmethod
+	def evaluate(backend, javaEvaluator, arguments, dropColumns):
+		arguments = backend.dumps(arguments)
+		dropColumns = backend.newArray("java.lang.String", dropColumns) if dropColumns else None
+		try:
+			results = backend.staticInvoke(PythonEvaluatorUtil.JAVA_CLASS_NAME, "evaluate", javaEvaluator, arguments, dropColumns)
+		except Exception as e:
+			raise backend.toJavaError(e)
+		results = backend.loads(results)
+		return results
+
+	@staticmethod
+	def evaluateAll(backend, javaEvaluator, arguments_dict, dropColumns, parallelism):
+		arguments_dict = backend.dumps(arguments_dict)
+		dropColumns = backend.newArray("java.lang.String", dropColumns) if dropColumns else None
+		try:
+			results_dict = backend.staticInvoke(PythonEvaluatorUtil.JAVA_CLASS_NAME, "evaluateAll", javaEvaluator, arguments_dict, dropColumns, parallelism)
+		except Exception as e:
+			raise backend.toJavaError(e)
+		results_dict = backend.loads(results_dict)
+		return results_dict
+
+	@staticmethod
+	def argumentsToResults(backend, arguments):
+		arguments = backend.dumps(arguments)
+		try:
+			results = backend.staticInvoke(PythonEvaluatorUtil.JAVA_CLASS_NAME, "argumentsToResults", arguments)
+		except Exception as e:
+			raise backend.toJavaError(e)
+		results = backend.loads(results)
+		return results
+
 class JavaBackend(ABC):
 
 	def __init__(self):
@@ -154,13 +192,7 @@ class Evaluator(JavaObject):
 
 	def evaluate(self, arguments, nan_as_missing = True):
 		arguments = _canonicalize(arguments, nan_as_missing = nan_as_missing)
-		arguments = self.backend.dumps(arguments)
-		dropColumns = self.backend.newArray("java.lang.String", self.dropColumns) if hasattr(self, "dropColumns") else None
-		try:
-			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonEvaluatorUtil", "evaluate", self.javaEvaluator, arguments, dropColumns)
-		except Exception as e:
-			raise self.backend.toJavaError(e)
-		results = self.backend.loads(results)
+		results = PythonEvaluatorUtil.evaluate(self.backend, self.javaEvaluator, arguments, self.dropColumns if hasattr(self, "dropColumns") else None)
 		return results
 
 	def evaluateAll(self, arguments_df, nan_as_missing = True, error_col = "errors", parallelism = -1):
@@ -173,13 +205,7 @@ class Evaluator(JavaObject):
 			"columns" : columns,
 			"data" : data
 		}
-		arguments = self.backend.dumps(arguments_dict)
-		dropColumns = self.backend.newArray("java.lang.String", self.dropColumns) if hasattr(self, "dropColumns") else None
-		try:
-			results = self.backend.staticInvoke("org.jpmml.evaluator.python.PythonEvaluatorUtil", "evaluateAll", self.javaEvaluator, arguments, dropColumns, parallelism)
-		except Exception as e:
-			raise self.backend.toJavaError(e)
-		results_dict = self.backend.loads(results)
+		results_dict = PythonEvaluatorUtil.evaluateAll(self.backend, self.javaEvaluator, arguments_dict, self.dropColumns if hasattr(self, "dropColumns") else None, parallelism)
 		columns = results_dict["columns"]
 		data = results_dict["data"]
 		errors = results_dict["errors"]

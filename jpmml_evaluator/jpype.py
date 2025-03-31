@@ -3,7 +3,7 @@ import importlib
 import jpype
 import jpype.imports
 
-from jpmml_evaluator import _classpath, JavaError, JNIBackend
+from jpmml_evaluator import _classpath, JavaError, JNIBackend, PythonEvaluatorUtil
 
 class JPypeBackend(JNIBackend):
 
@@ -15,7 +15,7 @@ class JPypeBackend(JNIBackend):
 	def ensureJVM(cls):
 		if not jpype.isJVMStarted():
 			cls.createJVM()
-		importlib.import_module("org.jpmml.evaluator.python.PythonEvaluatorUtil")
+		importlib.import_module(PythonEvaluatorUtil.JAVA_CLASS_NAME)
 
 	@classmethod
 	def createJVM(cls, user_classpath = []):

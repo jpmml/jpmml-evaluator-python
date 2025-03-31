@@ -1,4 +1,4 @@
-from jpmml_evaluator import _classpath, JavaError, JNIBackend
+from jpmml_evaluator import _classpath, JavaError, JNIBackend, PythonEvaluatorUtil
 
 class PyJNIusBackend(JNIBackend):
 
@@ -12,7 +12,7 @@ class PyJNIusBackend(JNIBackend):
 		if jnius_config.classpath is None:
 			cls.createJVM()
 		from jnius import autoclass
-		autoclass("org.jpmml.evaluator.python.PythonEvaluatorUtil")
+		autoclass(PythonEvaluatorUtil.JAVA_CLASS_NAME)
 
 	@classmethod
 	def createJVM(cls, user_classpath = []):

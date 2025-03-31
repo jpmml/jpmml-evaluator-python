@@ -5,7 +5,7 @@ import os
 from py4j.java_gateway import JavaGateway
 from py4j.protocol import Py4JJavaError
 
-from jpmml_evaluator import _classpath, JavaBackend, JavaError
+from jpmml_evaluator import _classpath, JavaBackend, JavaError, PythonEvaluatorUtil
 
 class Py4JBackend(JavaBackend):
 
@@ -22,7 +22,7 @@ class Py4JBackend(JavaBackend):
 	def ensureGateway(cls):
 		if not cls.gateway:
 			cls.createGateway()
-		getattr(cls.gateway.jvm, "org.jpmml.evaluator.python.PythonEvaluatorUtil")
+		getattr(cls.gateway.jvm, PythonEvaluatorUtil.JAVA_CLASS_NAME)
 		return cls.gateway
 
 	@classmethod

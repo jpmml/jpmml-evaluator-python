@@ -6,16 +6,10 @@ from unittest import TestCase
 import numpy
 import pandas
 
-from jpmml_evaluator import make_backend, make_evaluator, Evaluator, JavaError
+from jpmml_evaluator import make_backend, make_evaluator, Evaluator, JavaError, PythonEvaluatorUtil
 
 def _resource(name):
 	return os.path.join(os.path.dirname(__file__), "resources", name)
-
-def _argumentsToResults(backend, arguments):
-	arguments = backend.dumps(arguments)
-	results = backend.staticInvoke("org.jpmml.evaluator.python.PythonEvaluatorUtil", "argumentsToResults", arguments)
-	results = backend.loads(results)
-	return results
 
 class EvaluatorBuilderTest(TestCase):
 
@@ -72,7 +66,7 @@ class EvaluatorTest(TestCase):
 			"float" : float(1.0),
 			"bool" : bool(True)
 		}
-		pyResults = _argumentsToResults(backend, pyArguments)
+		pyResults = PythonEvaluatorUtil.argumentsToResults(backend, pyArguments)
 
 		self.assertDictEqual(pyArguments, pyResults)
 
@@ -83,7 +77,7 @@ class EvaluatorTest(TestCase):
 			"float32" : numpy.float32(1.0),
 			"float64" : numpy.float64(1.0)
 		}
-		numpyResults = _argumentsToResults(backend, numpyArguments)
+		numpyResults = PythonEvaluatorUtil.argumentsToResults(backend, numpyArguments)
 
 		self.assertDictEqual({"int8" : 1, "int16" : 1, "int32" : 1, "float32" : float(1.0), "float64" : float(1.0)}, numpyResults)
 
