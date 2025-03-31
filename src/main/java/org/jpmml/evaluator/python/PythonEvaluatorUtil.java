@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -113,24 +114,60 @@ public class PythonEvaluatorUtil {
 	public Map<String, ?> evaluateAll(Evaluator evaluator, Map<String, ?> argumentsDict, Set<String> dropColumns, int parallelism){
 		Table argumentsTable = parseDict(argumentsDict);
 
-		EvaluatorFunction function = new EvaluatorFunction(evaluator);
+		Function<Map<String, ?>, Object> function;
 
-		List<ResultField> resultFields = Stream.concat(
-				(evaluator.getTargetFields()).stream(),
-				(evaluator.getOutputFields()).stream()
-			)
-			.filter(resultField -> {
-				String name = resultField.getName();
+		TableCollector tableCollector;
 
-				if(dropColumns != null && dropColumns.contains(name)){
-					return false;
+		if(evaluator != null){
+			function = new EvaluatorFunction(evaluator);
+
+			List<ResultField> resultFields = Stream.concat(
+					(evaluator.getTargetFields()).stream(),
+					(evaluator.getOutputFields()).stream()
+				)
+				.filter(resultField -> {
+					String name = resultField.getName();
+
+					if(dropColumns != null && dropColumns.contains(name)){
+						return false;
+					}
+
+					return true;
+				})
+				.collect(Collectors.toList());
+
+			tableCollector = new ResultTableCollector(resultFields, true);
+		} else
+
+		{
+			function = (arguments) -> arguments;
+
+			tableCollector = new TableCollector(){
+
+				@Override
+				protected Table createFinisherTable(int initialSize){
+					return super.createFinisherTable(initialSize);
 				}
 
-				return true;
-			})
-			.collect(Collectors.toList());
+				@Override
+				protected Table.Row createFinisherRow(Table table){
+					Table.Row result = table.new Row(0, -1){
 
-		TableCollector tableCollector = new ResultTableCollector(resultFields, true);
+						@Override
+						public Object put(String key, Object value){
+
+							if(dropColumns != null && dropColumns.contains(key)){
+								return null;
+							}
+
+							return super.put(key, value);
+						}
+					};
+
+					return result;
+				}
+			};
+		}
 
 		Table resultsTable;
 
