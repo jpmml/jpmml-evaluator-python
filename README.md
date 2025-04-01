@@ -82,8 +82,8 @@ Currently, it's possible to choose between three backend implementations:
 | Implementation class alias | `"jpype"` | `"pyjnius"` | `"py4j"` |
 | Type | Local JVM via JNI | Local JVM via JNI | Local or remote JVM via TCP/IP sockets |
 | Restartable | No | No | Yes |
-| Timing* for `evaluate(X)` | 8.1 -- 9.4 | 10.8 -- 11.9 | 37.3 -- 40.2 |
-| Timing* for `evaluateAll(X)` | 2.55 -- 2.95 | 2.77 -- 3.18 | 3.27 -- 3.62 |
+| Timing* for `evaluate(X)` | 3.81 -- 4.06 | 3.69 -- 4.11 | 6.21 -- 6.84 |
+| Timing* for `evaluateAll(X)` | 0.94 -- 1.09 | 0.88 -- 0.96 | 0.92 -- 0.98 |
 
 [*] - Relative timings (smaller is better).
 
@@ -154,6 +154,14 @@ print(results_df)
 
 if errors is not None:
 	pass
+```
+
+### Benchmarking ###
+
+Run the `examples/benchmark.py` script with a sample model and dataset:
+
+```
+python -m examples.benchmark DecisionTreeIris.pmml Iris.csv
 ```
 
 # License #
