@@ -18,7 +18,7 @@ evaluator.evaluateAll(df, parallelism = 1)
 def benchmark(evaluator, df):
 	def _run(stmt):
 		print(stmt)
-		timings = Timer(stmt = stmt, globals = globals()).repeat(number = 100)
+		timings = Timer(stmt = stmt, globals = globals()).repeat(number = 1000)
 		min_time = min(timings)
 		max_time = max(timings)
 		mean_time = statistics.mean(timings)

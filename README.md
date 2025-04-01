@@ -82,10 +82,10 @@ Currently, it's possible to choose between three backend implementations:
 | Implementation class alias | `"jpype"` | `"pyjnius"` | `"py4j"` |
 | Type | Local JVM via JNI | Local JVM via JNI | Local or remote JVM via TCP/IP sockets |
 | Restartable | No | No | Yes |
-| Timing* for `evaluate(X)` | 3.81 -- 4.06 | 3.69 -- 4.11 | 6.21 -- 6.84 |
-| Timing* for `evaluateAll(X)` | 0.94 -- 1.09 | 0.88 -- 0.96 | 0.92 -- 0.98 |
+| Timing* for `evaluate(X)` | 1.51 -- 1.73 | 2.19 -- 2.34 | 10.12 -- 10.73 |
+| Timing* for `evaluateAll(X)` | 0.92 -- 0.98 | 0.98 -- 1.07 | 1.29 -- 1.40 |
 
-[*] - Relative timings (smaller is better).
+[*] - Relative timings for the `DecisionTreeIris.pmml` plus `Iris.csv` benchmark (smaller is better).
 
 ### Workflow ###
 
