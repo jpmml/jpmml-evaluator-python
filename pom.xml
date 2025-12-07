@@ -39,7 +39,7 @@
 	</issueManagement>
 
 	<properties>
-		<jpmml-evaluator.version>1.7.5</jpmml-evaluator.version>
+		<jpmml-evaluator.version>1.7.6</jpmml-evaluator.version>
 		<jpmml-python.version>1.3.9</jpmml-python.version>
 		<jpmml-transpiler.version>1.4.6</jpmml-transpiler.version>
 		<slf4j.version>2.0.17</slf4j.version>
