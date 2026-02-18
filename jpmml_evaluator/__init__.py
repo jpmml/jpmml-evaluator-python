@@ -133,9 +133,9 @@ class ModelField(JavaObject):
 		super(ModelField, self).__init__(backend)
 		self.javaModelField = javaModelField
 		# Transform Java objects to Python strings
-		self.name = javaModelField.getName()
-		self.dataType = javaModelField.getDataType().value()
-		self.opType = javaModelField.getOpType().value()
+		self.name = str(javaModelField.getName())
+		self.dataType = str(javaModelField.getDataType().value())
+		self.opType = str(javaModelField.getOpType().value())
 
 	def __str__(self):
 		return self.javaModelField.toString()

@@ -183,6 +183,7 @@ class EvaluatorTest(TestCase):
 
 		self.assertIsNone(errors)
 
+		arguments_df = arguments_df.astype(object)
 		arguments_df.iloc[13, :] = "error"
 
 		results_df = evaluator.evaluateAll(arguments_df)
@@ -191,20 +192,20 @@ class EvaluatorTest(TestCase):
 		self.assertEqual(arguments_df.index.tolist(), results_df.index.tolist())
 
 		self.assertEqual(1, results_df["errors"].count())
-		self.assertEqual(None, results_df["Species"][13])
-		self.assertEqual("org.jpmml.evaluator.ValueCheckException: Field \"Petal.Length\" cannot accept invalid value \"error\"", results_df["errors"][13])
+		self.assertTrue(pandas.isna(results_df["Species"].iloc[13]))
+		self.assertEqual("org.jpmml.evaluator.ValueCheckException: Field \"Petal.Length\" cannot accept invalid value \"error\"", results_df["errors"].iloc[13])
 
 		results_df, errors = evaluator.evaluateAll(arguments_df, error_col = None)
 
 		self.assertEqual((150, 4), results_df.shape)
 		self.assertEqual(arguments_df.index.tolist(), results_df.index.tolist())
 
-		self.assertEqual(None, results_df["Species"][13])
+		self.assertTrue(pandas.isna(results_df["Species"].iloc[13]))
 
 		self.assertEqual((150,), errors.shape)
 		self.assertEqual(arguments_df.index.tolist(), errors.index.tolist())
 
 		self.assertEqual(1, errors.count())
-		self.assertEqual("org.jpmml.evaluator.ValueCheckException: Field \"Petal.Length\" cannot accept invalid value \"error\"", errors[13])
+		self.assertEqual("org.jpmml.evaluator.ValueCheckException: Field \"Petal.Length\" cannot accept invalid value \"error\"", errors.iloc[13])
 
 		evaluator.suppressResultFields(None)
